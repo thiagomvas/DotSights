@@ -1,18 +1,14 @@
-﻿using DotSights.Core.Common.Types;
-using System.Runtime.InteropServices;
-using DotSights.Core;
-using DotSights.Core.Common;
 namespace DotSights.Tracker
 {
-	class Program
+	public class Program
 	{
-
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
-			TrackerSingleton.Instance.Track();
+			var builder = Host.CreateApplicationBuilder(args);
+			builder.Services.AddHostedService<Worker>();
+
+			var host = builder.Build();
+			host.Run();
 		}
-
 	}
-
-
 }

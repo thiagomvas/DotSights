@@ -11,10 +11,10 @@ namespace DotSights.Core.Common.Types
 		public Dictionary<int, int> UsageTimePerMonth { get; set; }
 		public string Alias { get; set; }
 
-		public ActivityData(string windowTitle)
+		public ActivityData(string windowTitle, int focusedTime)
 		{
 			WindowTitle = windowTitle;
-			FocusedTimeInSeconds = 0;
+			FocusedTimeInSeconds = focusedTime;
 			UsageTimePerWeekDay = new Dictionary<DayOfWeek, int>();
 			UsageTimePerHour = new Dictionary<int, int>();
 			UsageTimePerMonth = new Dictionary<int, int>();

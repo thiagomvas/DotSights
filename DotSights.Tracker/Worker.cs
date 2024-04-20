@@ -47,6 +47,7 @@ namespace DotSights.Tracker
 				else
 				{
 					var activity = new ActivityData(currentWindow);
+					activity.ProcessName = Core.DotSights.GetFocusedProcessName();
 					activity++;
 					trackedData.Add(currentWindow, activity);
 				}

@@ -1,4 +1,5 @@
 ﻿using DotSights.Core.Common.Types;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -10,7 +11,11 @@ public static class DotSights
 	private static extern IntPtr GetForegroundWindow();
 
 	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-	private static extern int GetWindowText(IntPtr hWnd, string lpString, int nMaxCount);
+	private static extern int GetWindowText(IntPtr hWnd, string lpString, int nMaxCount); 
+
+	[DllImport("user32.dll")]
+	private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
 
 	public static string GetFocusedWindow()
 	{
@@ -21,6 +26,18 @@ public static class DotSights
 			string windowTitle = new string(' ', nChars);
 			GetWindowText(foregroundWindowHandle, windowTitle, nChars);
 			return windowTitle.Substring(0, windowTitle.IndexOf('\0'));
+		}
+		return "";
+	}
+
+	public static string GetFocusedProcessName()
+	{
+		IntPtr foregroundWindowHandle = GetForegroundWindow();
+		if (foregroundWindowHandle != IntPtr.Zero)
+		{
+			GetWindowThreadProcessId(foregroundWindowHandle, out uint processId);
+			Process process = Process.GetProcessById((int)processId);
+			return process.ProcessName;
 		}
 		return "";
 	}

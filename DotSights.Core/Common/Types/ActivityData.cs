@@ -10,6 +10,7 @@ namespace DotSights.Core.Common.Types
 		public Dictionary<int, int> UsageTimePerHour { get; set; }
 		public Dictionary<int, int> UsageTimePerMonth { get; set; }
 		public string? Alias { get; set; }
+		public string? ProcessName { get; set; }
 
 		public ActivityData(string windowTitle)
 		{

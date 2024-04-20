@@ -1,4 +1,5 @@
 ﻿using DotSights.Core.Common.Types;
+using System.Text.Json;
 
 namespace DotSights.Core.Common
 {
@@ -26,30 +27,48 @@ namespace DotSights.Core.Common
 		public void Track()
 		{
 			startTime = DateTime.Now;
-			var loaded = File.ReadAllText(dataFilePath);
+
+			if(!File.Exists(dataFilePath))
+			{
+				File.Create(dataFilePath).Close();
+			}
+
+			var readJson = File.ReadAllText(dataFilePath);
 
 
-			Dictionary<string, ActivityData> windowFocusCount = new();
 
-			Directory.CreateDirectory(logFolderPath);
+			Dictionary<string, ActivityData> trackedData = new();
+
+			if (DotSights.DeserializeData(readJson, out var loadedData))
+			{
+				foreach (var activity in loadedData)
+				{
+					trackedData.Add(activity.WindowTitle, activity);
+				}
+			}
+
+			if (!Directory.Exists(logFolderPath))
+				Directory.CreateDirectory(logFolderPath);
 
 			while ((DateTime.Now - startTime).TotalSeconds <= 10)
 			{
 				string currentWindow = DotSights.GetFocusedWindow();
-				if (windowFocusCount.ContainsKey(currentWindow))
+				if (trackedData.ContainsKey(currentWindow))
 				{
-					windowFocusCount[currentWindow]++;
+					trackedData[currentWindow]++;
 				}
 				else
 				{
-					windowFocusCount.Add(currentWindow, new(currentWindow, 1));
+					var activity = new ActivityData(currentWindow);
+					activity++;
+					trackedData.Add(currentWindow, activity);
 
 				}
 				LogWindow(currentWindow);
 				Thread.Sleep(1000);
 			}
 
-			var json = DotSights.SerializeActivityData(windowFocusCount.Values.ToList());
+			var json = DotSights.SerializeData(trackedData.Values.ToList());
 			File.WriteAllText(dataFilePath, json);
 		}
 

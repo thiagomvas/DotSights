@@ -1,6 +1,6 @@
 ﻿using DotSights.Core.Common.Types;
-using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace DotSights.Core;
 
@@ -25,25 +25,23 @@ public static class DotSights
 		return "";
 	}
 
-	public static string SerializeActivityData(List<ActivityData> data)
+	public static string SerializeData(List<ActivityData> data)
 	{
-		return JsonConvert.SerializeObject(data, Formatting.Indented);
+		return JsonSerializer.Serialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default);
 	}
 
-	public static string SerializeActivityData(ActivityData activityData)
+	public static bool DeserializeData(string data, out List<ActivityData>? result)
 	{
-		return JsonConvert.SerializeObject(activityData, Formatting.Indented);
+		try
+		{
+			result = JsonSerializer.Deserialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default) as List<ActivityData>;
+			return true;
+		}
+		catch (Exception)
+		{
+			result = null;
+			return false;
+		}
 	}
-
-	public static ActivityData? DeserializeActivityData(string serializedData)
-	{
-		return JsonConvert.DeserializeObject<ActivityData>(serializedData);
-	}
-
-	public static List<ActivityData>? DeserializeActivityDataList(string serializedData)
-	{
-		return JsonConvert.DeserializeObject<List<ActivityData>>(serializedData);
-	}
-
 }
 

@@ -16,29 +16,22 @@
 
 
 	<Panel>
-		<ExperimentalAcrylicBorder IsHitTestVisible="False">
-			<ExperimentalAcrylicBorder.Material>
-				<ExperimentalAcrylicMaterial
-					BackgroundSource="Digger"
-					TintColor="Black"
-					TintOpacity="1"
-					MaterialOpacity="0.35" />
-			</ExperimentalAcrylicBorder.Material>
-		</ExperimentalAcrylicBorder>
 
 		<Border Padding="15, 15, 0, 0">
 			<DockPanel>
 				<!-- Side Bar -->
 				<Button DockPanel.Dock="Top" Width="20" Height="20" Background="Transparent" HorizontalAlignment="Left">
 					<Image Source="/Assets/avalonia-logo.ico" Width="20" Height="20"/>
-					</Button>
+				</Button>
 				<StackPanel DockPanel.Dock="Left" Margin="0, 0, 25, 0" Background="Transparent">
 					<views:SideBarView />
 				</StackPanel>
 
 				<!-- Content -->
-				
-				<views:HomeView DataContext="{Binding HomePage}"/>
+				<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+
+					<views:HomeView DataContext="{Binding HomePage}"/>
+				</ScrollViewer>
 			</DockPanel>
 
 		</Border>

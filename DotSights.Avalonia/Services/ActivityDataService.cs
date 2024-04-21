@@ -6,10 +6,10 @@ namespace DotSights.Avalonia.Services
 {
 	public class ActivityDataService
 	{
-		public IEnumerable<ActivityData> GetActivityData() => [
-			new() {WindowTitle = "Discord", FocusedTimeInSeconds = 20, ProcessName = "discord"},
-			new() {WindowTitle = "Visual Studio Code", FocusedTimeInSeconds = 30, ProcessName = "code"},
-			new() {WindowTitle = "Google Chrome", FocusedTimeInSeconds = 40, ProcessName = "chrome"},
-		];
+		public IEnumerable<ActivityData> GetActivityData()
+		{
+			Core.DotSights.DataFilePath = @"C:\Users\Thiago\source\repos\DotSights\DotSights.Tracker\DotSightsData.json";
+			return Core.DotSights.GetDataFromDataPath();
+		}
 	}
 }

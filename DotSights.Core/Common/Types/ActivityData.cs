@@ -12,6 +12,24 @@ namespace DotSights.Core.Common.Types
 		public string? Alias { get; set; }
 		public string? ProcessName { get; set; }
 
+		public string FormattedTotalUsageTime
+		{
+			get
+			{
+				if(FocusedTimeInSeconds > 3600)
+				{
+					return $"{FocusedTimeInSeconds / 3600}h {FocusedTimeInSeconds % 3600 / 60}m {FocusedTimeInSeconds % 60}s";
+				}
+				else if(FocusedTimeInSeconds > 60)
+				{
+					return $"{FocusedTimeInSeconds / 60}m {FocusedTimeInSeconds % 60}s";
+				}
+				else
+				{
+					return $"{FocusedTimeInSeconds}s";
+				}
+			}
+		}
 		public ActivityData(string windowTitle)
 		{
 			WindowTitle = windowTitle;

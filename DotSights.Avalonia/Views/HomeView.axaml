@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DotSights.Avalonia.ViewModels"
+			 xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
 			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DotSights.Avalonia.Views.HomeView"
 			 x:DataType="vm:HomePageViewModel">
@@ -11,10 +12,24 @@
 		<ItemsControl ItemsSource="{Binding ListItems}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding ProcessName}" />
+					<Button HorizontalAlignment="Stretch">
+						<StackPanel>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock FontSize="16" FontWeight="Bold" Text="{Binding WindowTitle}"/>
+								<TextBlock FontSize="16" FontWeight="Bold" Text=" - " />
+								<TextBlock Foreground="Orange" FontSize="16" FontWeight="Bold" Text="{Binding ProcessName}"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="Total usage tracked: " />
+								<TextBlock Text="{Binding FormattedTotalUsageTime}"/>
+							</StackPanel>
+						</StackPanel>
+					</Button>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
+		<Image Source="{Binding FocusedTimeImage}"/>
+		<Image Source="{Binding HourlyUseImage}"/>
 
 	</StackPanel>
 </UserControl>

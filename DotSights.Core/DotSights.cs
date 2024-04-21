@@ -7,7 +7,7 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
-	public static string DataFilePath { get; private set; } = "data.json";
+	public static string DataFilePath { get; set; } = "data.json";
 
 	[DllImport("user32.dll")]
 	private static extern IntPtr GetForegroundWindow();

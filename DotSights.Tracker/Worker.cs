@@ -9,9 +9,9 @@ namespace DotSights.Tracker
 		private string dataFilePath = "DotSightsData.json";
 		private static DateTime startTime;
 		private Dictionary<string, ActivityData> trackedData = new();
-		private Timer? _timer = null;
 
-		int ciclesSinceSave = 0;
+		int ciclesSinceSave = 0; // 1 cycle = 1 second
+		int saveCicleDelay = 60 * 5; // Save every 5 minutes ( 60 seconds * 5 )
 		public Worker(ILogger<Worker> logger)
 		{
 			_logger = logger;
@@ -52,7 +52,7 @@ namespace DotSights.Tracker
 					trackedData.Add(currentWindow, activity);
 				}
 
-				if(ciclesSinceSave >= 5)
+				if(ciclesSinceSave >= saveCicleDelay)
 				{
 					SaveData(null);
 					ciclesSinceSave = 0;

@@ -7,6 +7,8 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
+	public static string DataFilePath { get; private set; } = "data.json";
+
 	[DllImport("user32.dll")]
 	private static extern IntPtr GetForegroundWindow();
 
@@ -59,6 +61,24 @@ public static class DotSights
 			result = null;
 			return false;
 		}
+	}
+
+	public static List<ActivityData> GetDataFromDataPath()
+	{
+		if (File.Exists(DataFilePath))
+		{
+			string data = File.ReadAllText(DataFilePath);
+			if (DeserializeData(data, out List<ActivityData>? result))
+			{
+				return result;
+			}
+		}
+		return new List<ActivityData>();
+	}
+
+	public static void SaveDataToDataPath(List<ActivityData> data)
+	{
+		File.WriteAllText(DataFilePath, SerializeData(data));
 	}
 }
 

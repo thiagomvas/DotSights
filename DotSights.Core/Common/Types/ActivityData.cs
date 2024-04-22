@@ -11,7 +11,9 @@ namespace DotSights.Core.Common.Types
 		public Dictionary<int, int> UsageTimePerMonth { get; set; }
 		public string? Alias { get; set; }
 		public string? ProcessName { get; set; }
+		public Dictionary<DateTime, int> Last7DaysUsage { get; set; }
 
+		public int TotalTimeToday => Last7DaysUsage.ContainsKey(DateTime.Today) ? Last7DaysUsage[DateTime.Today] : 0;
 		public string FormattedTotalUsageTime
 		{
 			get
@@ -37,6 +39,7 @@ namespace DotSights.Core.Common.Types
 			UsageTimePerWeekDay = new Dictionary<DayOfWeek, int>();
 			UsageTimePerHour = new Dictionary<int, int>();
 			UsageTimePerMonth = new Dictionary<int, int>();
+			Last7DaysUsage = new Dictionary<DateTime, int>();
 		}
 		public ActivityData()
 		{
@@ -45,6 +48,7 @@ namespace DotSights.Core.Common.Types
 			UsageTimePerWeekDay = new Dictionary<DayOfWeek, int>();
 			UsageTimePerHour = new Dictionary<int, int>();
 			UsageTimePerMonth = new Dictionary<int, int>();
+			Last7DaysUsage = new Dictionary<DateTime, int>();
 		}
 		public static ActivityData operator ++(ActivityData activityData)
 		{
@@ -79,6 +83,12 @@ namespace DotSights.Core.Common.Types
 			{
 				activityData.UsageTimePerMonth.Add(currentMonth, 1);
 			}
+
+			activityData.EnsureLast7DaysData();
+
+			DateTime today = DateTime.Today;
+			activityData.Last7DaysUsage[today] = activityData.Last7DaysUsage.GetValueOrDefault(today) + 1;
+
 			return activityData;
 		}
 
@@ -103,6 +113,28 @@ namespace DotSights.Core.Common.Types
 				sb.AppendLine($"{kvp.Key}: {kvp.Value}");
 			}
 			return sb.ToString();
+		}
+
+		public void EnsureLast7DaysData()
+		{
+			DateTime today = DateTime.Today;
+			DateTime startDate = today.AddDays(-6); 
+			for (DateTime date = startDate; date < today; date = date.AddDays(1))
+			{
+				if (!Last7DaysUsage.ContainsKey(date))
+				{
+					Last7DaysUsage.Add(date, 0);
+				}
+			}
+
+			if (!Last7DaysUsage.ContainsKey(today))
+			{
+				Last7DaysUsage.Add(today, 0);
+			}
+
+			Last7DaysUsage = Last7DaysUsage
+				.Where(kv => (today - kv.Key).TotalDays <= 6)
+				.ToDictionary(kv => kv.Key, kv => kv.Value);
 		}
 	}
 }

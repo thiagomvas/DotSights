@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using DotSights.Dashboard.Services;
 using DotSights.Dashboard.ViewModels;
 using DotSights.Dashboard.Views;
 
@@ -27,6 +28,7 @@ namespace DotSights.Dashboard
 					DataContext = new MainWindowViewModel(),
 				};
 			}
+			ConfigurationService.Instance.LoadSettings();
 
 			base.OnFrameworkInitializationCompleted();
 		}

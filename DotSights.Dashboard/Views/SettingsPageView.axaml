@@ -2,7 +2,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:DotSights.Dashboard.ViewModels;assembly=DotSights.Dashboard"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="DotSights.Dashboard.Views.SettingsPageView">
-  Welcome to Avalonia!
+             x:Class="DotSights.Dashboard.Views.SettingsPageView"
+			 x:DataType="vm:SettingsPageViewModel">
+	<StackPanel>
+		<CheckBox Content="Group usage by process names" IsChecked="{Binding GroupItemsWithSameProcessName}"/>
+		<CheckBox Content="Group usage by grouping rules" IsChecked="{Binding GroupItemsUsingGroupingRules}"/>
+		<ListBox ItemsSource="{Binding GroupingRules}" DataContext="{Binding}">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<TextBox Text="{Binding Name}"/>
+						<TextBox Text="{Binding RegexQuery}"/>
+						<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveRule}" CommandParameter="{Binding}">
+							<PathIcon Data="{StaticResource delete_regular}"/>	
+						</Button>
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Button Command="{Binding AddRule}">Add Rule</Button>
+		<Button Content="Save Settings" Command="{Binding SaveSettings}"/>
+	</StackPanel>
 </UserControl>

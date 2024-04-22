@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotSights.Core.Common.Types
 {
@@ -49,6 +50,87 @@ namespace DotSights.Core.Common.Types
 			UsageTimePerHour = new Dictionary<int, int>();
 			UsageTimePerMonth = new Dictionary<int, int>();
 			Last7DaysUsage = new Dictionary<DateTime, int>();
+		}
+
+		public static ActivityData operator +(ActivityData left, ActivityData right)
+		{
+			ActivityData result = new ActivityData();
+
+			result.WindowTitle = left.WindowTitle;
+			result.FocusedTimeInSeconds = left.FocusedTimeInSeconds + right.FocusedTimeInSeconds;
+
+			result.UsageTimePerWeekDay = new Dictionary<DayOfWeek, int>();
+			foreach (var kvp in left.UsageTimePerWeekDay)
+			{
+				result.UsageTimePerWeekDay[kvp.Key] = kvp.Value;
+			}
+			foreach (var kvp in right.UsageTimePerWeekDay)
+			{
+				if (result.UsageTimePerWeekDay.ContainsKey(kvp.Key))
+				{
+					result.UsageTimePerWeekDay[kvp.Key] += kvp.Value;
+				}
+				else
+				{
+					result.UsageTimePerWeekDay[kvp.Key] = kvp.Value;
+				}
+			}
+
+			result.UsageTimePerHour = new Dictionary<int, int>();
+			foreach (var kvp in left.UsageTimePerHour)
+			{
+				result.UsageTimePerHour[kvp.Key] = kvp.Value;
+			}
+			foreach (var kvp in right.UsageTimePerHour)
+			{
+				if (result.UsageTimePerHour.ContainsKey(kvp.Key))
+				{
+					result.UsageTimePerHour[kvp.Key] += kvp.Value;
+				}
+				else
+				{
+					result.UsageTimePerHour[kvp.Key] = kvp.Value;
+				}
+			}
+
+			result.UsageTimePerMonth = new Dictionary<int, int>();
+			foreach (var kvp in left.UsageTimePerMonth)
+			{
+				result.UsageTimePerMonth[kvp.Key] = kvp.Value;
+			}
+			foreach (var kvp in right.UsageTimePerMonth)
+			{
+				if (result.UsageTimePerMonth.ContainsKey(kvp.Key))
+				{
+					result.UsageTimePerMonth[kvp.Key] += kvp.Value;
+				}
+				else
+				{
+					result.UsageTimePerMonth[kvp.Key] = kvp.Value;
+				}
+			}
+
+			result.Alias = left.Alias;
+			result.ProcessName = left.ProcessName;
+
+			result.Last7DaysUsage = new Dictionary<DateTime, int>();
+			foreach (var kvp in left.Last7DaysUsage)
+			{
+				result.Last7DaysUsage[kvp.Key] = kvp.Value;
+			}
+			foreach (var kvp in right.Last7DaysUsage)
+			{
+				if (result.Last7DaysUsage.ContainsKey(kvp.Key))
+				{
+					result.Last7DaysUsage[kvp.Key] += kvp.Value;
+				}
+				else
+				{
+					result.Last7DaysUsage[kvp.Key] = kvp.Value;
+				}
+			}
+
+			return result;
 		}
 		public static ActivityData operator ++(ActivityData activityData)
 		{
@@ -136,5 +218,54 @@ namespace DotSights.Core.Common.Types
 				.Where(kv => (today - kv.Key).TotalDays <= 6)
 				.ToDictionary(kv => kv.Key, kv => kv.Value);
 		}
+
+
+		public static List<ActivityData> GroupByRule(IEnumerable<ActivityData> activityDataList, GroupingRule rule)
+		{
+			List<ActivityData> groupedDataList = new List<ActivityData>();
+			List<ActivityData> unmatchedDataList = new List<ActivityData>();
+			string regexPattern = rule.RegexQuery;
+
+			// Regex to match the provided pattern
+			Regex regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
+
+			// Initialize a variable to hold the merged data
+			ActivityData mergedData = null;
+
+			foreach (ActivityData data in activityDataList)
+			{
+				if (regex.IsMatch(data.WindowTitle))
+				{
+					// If this is the first matching data, initialize mergedData
+					if (mergedData == null)
+					{
+						mergedData = data;
+						mergedData.WindowTitle = rule.Name;
+					}
+					else
+					{
+						// Merge the current data with the existing mergedData
+						mergedData += data;
+					}
+				}
+				else
+				{
+					// Add unmatched data to the unmatched list
+					unmatchedDataList.Add(data);
+				}
+			}
+
+			// If mergedData is not null, add it to the groupedDataList
+			if (mergedData != null)
+			{
+				groupedDataList.Add(mergedData);
+			}
+
+			// Add the unmatched data to the groupedDataList
+			groupedDataList.AddRange(unmatchedDataList);
+
+			return groupedDataList;
+		}
 	}
 }
+

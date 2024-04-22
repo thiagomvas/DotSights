@@ -12,5 +12,6 @@
     <Application.Styles>
         <FluentTheme />
 		<StyleInclude Source="avares://DotSights.Dashboard/Assets/Icons.axaml"/>
+		<StyleInclude Source="avares://DotSights.Dashboard/Assets/Styles.axaml"/>
     </Application.Styles>
 </Application>

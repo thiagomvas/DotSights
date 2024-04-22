@@ -17,14 +17,14 @@ namespace DotSights.Avalonia.ViewModels
 {
 	public class HomePageViewModel : ViewModelBase
 	{
-		public static AvaPlot? plot;
-		public static AvaPlot? hourlyusageplot;
 
 		public string SearchQuery { get; set; } = "";
 		public Bitmap? HourlyUseImage { get; private set; } 
 		public Bitmap? FocusedTimeImage { get; private set; }
 
 		public string TotalTimeToday { get; set; } = "";
+		public string TotalTimeYersteday { get; set; } = "";
+		public string TotalTimeThisWeek { get; set; } = "";
 
 		private static string FolderPath = Environment.CurrentDirectory;
 		private const string hourlyuseplotfilename = "HourlyTimeUsagePlot.png";
@@ -33,7 +33,7 @@ namespace DotSights.Avalonia.ViewModels
 		public HomePageViewModel(IEnumerable<ActivityData> activities)
 		{
 			// Initialize ListItems using the new keyword
-			ListItems = new ObservableCollection<ActivityData>(activities);
+			listItems = new ObservableCollection<ActivityData>(activities);
 			data = activities.ToList();
 
 			App.CreateDataCharts(activities.ToList());
@@ -42,6 +42,8 @@ namespace DotSights.Avalonia.ViewModels
 			FocusedTimeImage = new Bitmap(Path.Combine(FolderPath, foucsedtimeplotfilename));
 
 			TotalTimeToday = DotFormatting.FormatTimeLong(activities.Sum(x => x.TotalTimeToday));
+			TotalTimeYersteday = DotFormatting.FormatTimeLong(activities.Sum(x => x.Last7DaysUsage.ContainsKey(DateTime.Today.AddDays(-1)) ? x.Last7DaysUsage[DateTime.Today.AddDays(-1)] : 0));
+			TotalTimeThisWeek = DotFormatting.FormatTimeLong(activities.Sum(x => x.Last7DaysUsage.Values.Sum()));
 		}
 
 

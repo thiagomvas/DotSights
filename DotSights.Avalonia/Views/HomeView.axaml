@@ -17,30 +17,30 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 
-					<Button Grid.Column="0" Padding="0">
+					<Button Grid.Column="0" Padding="0" HorizontalAlignment="Stretch">
 						<Grid>
 							<Panel Background="#47b39d" Opacity="0.25"/>
 							<StackPanel>
-								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
-								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
+								<TextBlock Padding="10" Classes="h1">Today</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" FontStyle="Italic" Text="{Binding TotalTimeToday}"/>
 							</StackPanel>
 						</Grid>
 					</Button>
-					<Button Grid.Column="1" Padding="0">
+					<Button Grid.Column="1" Padding="0" HorizontalAlignment="Stretch">
 						<Grid>
 							<Panel Background="#eb6b56" Opacity="0.25"/>
 							<StackPanel>
-								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
-								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
+								<TextBlock Padding="10" Classes="h1">Yersteday</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" FontStyle="Italic" Text="{Binding TotalTimeYersteday}"/>
 							</StackPanel>
 						</Grid>
 					</Button>
-					<Button Grid.Column="2" Padding="0">
+					<Button Grid.Column="2" Padding="0" HorizontalAlignment="Stretch">
 						<Grid>
 							<Panel Background="#462446" Opacity="0.25"/>
 							<StackPanel>
-								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
-								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
+								<TextBlock Padding="10" Classes="h1">Past 7 days</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" FontStyle="Italic" Text="{Binding TotalTimeThisWeek}"/>
 							</StackPanel>
 						</Grid>
 					</Button>

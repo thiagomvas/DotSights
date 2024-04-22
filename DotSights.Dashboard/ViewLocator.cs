@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using DotSights.Avalonia.ViewModels;
+using DotSights.Dashboard.ViewModels;
 using System;
 
-namespace DotSights.Avalonia
+namespace DotSights.Dashboard
 {
 	public class ViewLocator : IDataTemplate
 	{

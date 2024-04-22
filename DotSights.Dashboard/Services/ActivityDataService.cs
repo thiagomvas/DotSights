@@ -1,11 +1,9 @@
-﻿using Avalonia;
-using DotSights.Core;
-using DotSights.Core.Common.Types;
+﻿using System.Collections.Generic;
 using System;
-using System.Collections.Generic;
+using DotSights.Core.Common.Types;
 using System.IO;
 
-namespace DotSights.Avalonia.Services
+namespace DotSights.Dashboard.Services
 {
 	public class ActivityDataService
 	{

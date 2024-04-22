@@ -1,42 +1,55 @@
-﻿using Avalonia;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DotSights.Core;
 using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
-using ReactiveUI;
-using ScottPlot;
-using ScottPlot.Avalonia;
-using ScottPlot.Plottables;
+using DotSights.Dashboard.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
-namespace DotSights.Avalonia.ViewModels
+namespace DotSights.Dashboard.ViewModels
 {
-	public class HomePageViewModel : ViewModelBase
+	public partial class HomePageViewModel : ViewModelBase
 	{
+		[ObservableProperty]
+		private string _searchQuery = "";
 
-		public string SearchQuery { get; set; } = "";
-		public Bitmap? HourlyUseImage { get; private set; } 
-		public Bitmap? FocusedTimeImage { get; private set; }
+		[ObservableProperty]
+		private Bitmap? _hourlyUseImage;
+		[ObservableProperty]
+		private Bitmap? _focusedTimeImage;
 
-		public string TotalTimeToday { get; set; } = "";
-		public string TotalTimeYersteday { get; set; } = "";
-		public string TotalTimeThisWeek { get; set; } = "";
+		[ObservableProperty]
+		private string _totalTimeToday = "";
+		[ObservableProperty]
+		private string _totalTimeYersteday = "";
+		[ObservableProperty]
+		private string _totalTimeThisWeek = "";
+
+		public ObservableCollection<ActivityData> ListItems { get => _listItems; set => this.SetProperty(ref _listItems, value); }
+		private ObservableCollection<ActivityData> _listItems = new();
+
+		private List<ActivityData> data = new();
 
 		private static string FolderPath = Environment.CurrentDirectory;
 		private const string hourlyuseplotfilename = "HourlyTimeUsagePlot.png";
 		private const string foucsedtimeplotfilename = "FocusedTimePlot.png";
-		private List<ActivityData> data = new();
-		public HomePageViewModel(IEnumerable<ActivityData> activities)
-		{
-			// Initialize ListItems using the new keyword
-			listItems = new ObservableCollection<ActivityData>(activities);
-			data = activities.ToList();
 
-			App.CreateDataCharts(activities.ToList());
+		public HomePageViewModel()
+		{
+			var service = new ActivityDataService();
+			var activities = service.GetActivityData().ToList();
+			if (activities == null || activities.Count == 0)
+				return;
+
+			// Initialize ListItems using the new keyword
+			_listItems = new ObservableCollection<ActivityData>(activities);
+			data = activities;
+
+			Core.DotSights.CreateDataCharts(activities);
 
 			HourlyUseImage = new Bitmap(Path.Combine(FolderPath, hourlyuseplotfilename));
 			FocusedTimeImage = new Bitmap(Path.Combine(FolderPath, foucsedtimeplotfilename));
@@ -45,10 +58,6 @@ namespace DotSights.Avalonia.ViewModels
 			TotalTimeYersteday = DotFormatting.FormatTimeLong(activities.Sum(x => x.Last7DaysUsage.ContainsKey(DateTime.Today.AddDays(-1)) ? x.Last7DaysUsage[DateTime.Today.AddDays(-1)] : 0));
 			TotalTimeThisWeek = DotFormatting.FormatTimeLong(activities.Sum(x => x.Last7DaysUsage.Values.Sum()));
 		}
-
-
-        public ObservableCollection<ActivityData> ListItems { get => listItems; set => this.RaiseAndSetIfChanged(ref listItems, value); }
-		private ObservableCollection<ActivityData> listItems;
 
 		public void SearchCommand()
 		{

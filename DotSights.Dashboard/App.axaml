@@ -1,19 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="DotSights.Avalonia.App"
-             xmlns:local="using:DotSights.Avalonia"
+             x:Class="DotSights.Dashboard.App"
+             xmlns:local="using:DotSights.Dashboard"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
-	<Application.Styles>
-		<StyleInclude Source="Styles.axaml"/>
-	</Application.Styles>
-	
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>
         <FluentTheme />
+		<StyleInclude Source="avares://DotSights.Dashboard/Assets/Icons.axaml"/>
     </Application.Styles>
 </Application>

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotSights.Core", "DotSights
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotSights.Tracker", "DotSights.Tracker\DotSights.Tracker.csproj", "{9136C7A1-DCC7-486E-8B35-2E2084964E26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotSights.Avalonia", "DotSights.Avalonia\DotSights.Avalonia.csproj", "{537926A0-6533-4882-A1BF-C4D537D8562B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotSights.Dashboard", "DotSights.Dashboard\DotSights.Dashboard.csproj", "{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{9136C7A1-DCC7-486E-8B35-2E2084964E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9136C7A1-DCC7-486E-8B35-2E2084964E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9136C7A1-DCC7-486E-8B35-2E2084964E26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{537926A0-6533-4882-A1BF-C4D537D8562B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{537926A0-6533-4882-A1BF-C4D537D8562B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{537926A0-6533-4882-A1BF-C4D537D8562B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{537926A0-6533-4882-A1BF-C4D537D8562B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

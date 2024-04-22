@@ -2,11 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace DotSights.Avalonia.Views;
+namespace DotSights.Dashboard.Views;
 
-public partial class SideBarView : UserControl
+public partial class HomePageView : UserControl
 {
-    public SideBarView()
+    public HomePageView()
     {
         InitializeComponent();
     }

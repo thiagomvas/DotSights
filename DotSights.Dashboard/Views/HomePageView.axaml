@@ -2,10 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:DotSights.Avalonia.ViewModels"
-			 xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="DotSights.Avalonia.Views.HomeView"
+			 xmlns:vm="clr-namespace:DotSights.Dashboard.ViewModels;assembly=DotSights.Dashboard"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DotSights.Dashboard.Views.HomePageView"
 			 x:DataType="vm:HomePageViewModel">
 	<StackPanel>
 		<Border Classes="ContentBorder">
@@ -69,7 +68,7 @@
 				</ItemsControl>
 			</StackPanel>
 		</Border>
-		<Image Source="{Binding HourlyUseImage}"/>
+		<Image Source="{Binding HourlyUseImage}" MaxHeight="500"/>
 
 	</StackPanel>
 </UserControl>

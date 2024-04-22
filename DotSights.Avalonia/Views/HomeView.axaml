@@ -8,27 +8,67 @@
              x:Class="DotSights.Avalonia.Views.HomeView"
 			 x:DataType="vm:HomePageViewModel">
 	<StackPanel>
-		<TextBlock>Foo bar</TextBlock>
-		<ItemsControl ItemsSource="{Binding ListItems}">
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<Button HorizontalAlignment="Stretch">
-						<StackPanel>
-							<StackPanel Orientation="Horizontal">
-								<TextBlock FontSize="16" FontWeight="Bold" Text="{Binding WindowTitle}"/>
-								<TextBlock FontSize="16" FontWeight="Bold" Text=" - " />
-								<TextBlock Foreground="Orange" FontSize="16" FontWeight="Bold" Text="{Binding ProcessName}"/>
+		<Border Classes="ContentBorder">
+			<StackPanel>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+
+					<Button Grid.Column="0" Padding="0">
+						<Grid>
+							<Panel Background="#47b39d" Opacity="0.25"/>
+							<StackPanel>
+								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
 							</StackPanel>
-							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="Total usage tracked: " />
-								<TextBlock Text="{Binding FormattedTotalUsageTime}"/>
-							</StackPanel>
-						</StackPanel>
+						</Grid>
 					</Button>
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
-		<Image Source="{Binding FocusedTimeImage}"/>
+					<Button Grid.Column="1" Padding="0">
+						<Grid>
+							<Panel Background="#eb6b56" Opacity="0.25"/>
+							<StackPanel>
+								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
+							</StackPanel>
+						</Grid>
+					</Button>
+					<Button Grid.Column="2" Padding="0">
+						<Grid>
+							<Panel Background="#462446" Opacity="0.25"/>
+							<StackPanel>
+								<TextBlock Padding="10" Classes="h1">Total time today</TextBlock>
+								<TextBlock Padding="10" Classes="h2" FontWeight="Normal" Text="{Binding TotalTimeToday}"/>
+							</StackPanel>
+						</Grid>
+					</Button>
+
+				</Grid>
+				<TextBox Text="{Binding SearchQuery}" Watermark="Search" Margin="10"/>
+				<Button Content="Search" Command="{Binding SearchCommand}" Margin="10"/>
+				<ItemsControl ItemsSource="{Binding ListItems}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button HorizontalAlignment="Stretch">
+								<StackPanel>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock FontSize="16" FontWeight="Bold" Text="{Binding WindowTitle}"/>
+										<TextBlock FontSize="16" FontWeight="Bold" Text=" - " />
+										<TextBlock Foreground="Orange" FontSize="16" FontWeight="Bold" Text="{Binding ProcessName}"/>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock Text="Total usage tracked: " />
+										<TextBlock Text="{Binding FormattedTotalUsageTime}"/>
+									</StackPanel>
+								</StackPanel>
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</Border>
 		<Image Source="{Binding HourlyUseImage}"/>
 
 	</StackPanel>

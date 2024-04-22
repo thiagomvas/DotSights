@@ -11,7 +11,7 @@ namespace DotSights.Tracker
 		private Dictionary<string, ActivityData> trackedData = new();
 
 		int ciclesSinceSave = 0; // 1 cycle = 1 second
-		int saveCicleDelay = 60 * 5; // Save every 5 minutes ( 60 seconds * 5 )
+		int saveCicleDelay = 5; // Save every 5 minutes ( 60 seconds * 5 )
 		public Worker(ILogger<Worker> logger)
 		{
 			_logger = logger;

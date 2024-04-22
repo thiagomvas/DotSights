@@ -71,6 +71,11 @@ namespace DotSights.Avalonia
 			var barPlot = plot2.Add.Bars(Enumerable.Range(0, 24).Select(e => (double) e).ToArray(), plotValues);
 			plot2.FigureBackground.Color = Color.FromHex("#00000000");
 			plot2.Axes.Color(Color.FromHex("#FFFFFF"));
+			plot2.Axes.Margins(0, 0, 0);
+
+			ScottPlot.TickGenerators.NumericAutomatic gen = new() { LabelFormatter = (val) => DotFormatting.FormatHourToComputerClock((int)val) };
+
+			plot2.Axes.Bottom.TickGenerator = gen;
 
 			barPlot.ValueLabelStyle.ForeColor = Color.FromHex("#FFFFFF");
 			barPlot.Color = Color.FromHex("#F68A06");
@@ -78,7 +83,7 @@ namespace DotSights.Avalonia
 			var bars = barPlot.Bars.ToList();
 			for(int i = 0; i < 24; i++)
 			{
-				bars[i].Label = DotFormatting.FormatTime((int) hourlyUsageInSeconds[i]);
+				bars[i].Label = DotFormatting.FormatTimeShort((int)hourlyUsageInSeconds[i]);
 				bars[i].BorderLineWidth = 0;
 			}
 			

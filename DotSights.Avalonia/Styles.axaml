@@ -1,0 +1,37 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Classes="ContentBorder" Padding="20">
+			<StackPanel>
+				<TextBlock>Hello World!</TextBlock>
+				<TextBlock>How are you?</TextBlock>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Panel with a thin line border -->
+	<Style Selector="Border.ContentBorder">
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="Gray"/>
+		<Setter Property="Margin" Value="15, 15, 15, 15"/>
+		<Setter Property="Padding" Value="15, 15, 15, 15" />
+		<Setter Property="CornerRadius" Value="5" />
+	</Style>
+
+	<Style Selector="TextBlock.h1">
+		<Setter Property="FontSize" Value="24"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+	</Style>
+
+	<Style Selector="TextBlock.h2">
+		<Setter Property="FontSize" Value="20"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+	</Style>
+
+	<Style Selector="TextBlock.h3">
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+	</Style>
+
+
+</Styles>

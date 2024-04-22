@@ -2,7 +2,7 @@
 {
 	public static class DotFormatting
 	{
-		public static string FormatTime(int seconds)
+		public static string FormatTimeShort(int seconds)
 		{
 			if (seconds <= 0)
 				return "";
@@ -24,6 +24,36 @@
 
 			return formattedTime;
 
+		}
+
+		public static string FormatTimeLong(int seconds)
+		{
+			if (seconds <= 0)
+				return "";
+
+			int hours = seconds / 3600;
+			int minutes = (seconds % 3600) / 60;
+			int secs = seconds % 60;
+
+			string formattedTime = "";
+
+			if (hours > 0)
+				formattedTime += $"{hours} hours ";
+
+			if (minutes > 0)
+				formattedTime += $"{minutes} minutes ";
+
+			if (secs > 0)
+				formattedTime += $"{secs} seconds";
+
+			return formattedTime;
+		}
+
+		public static string FormatHourToComputerClock(int hour)
+		{
+			TimeOnly time = new(hour, 0);
+
+			return time.ToString();
 		}
 	}
 }

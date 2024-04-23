@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using DotSights.Core.Common.Types;
 using DotSights.Dashboard.Models;
 using DotSights.Dashboard.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -17,6 +18,9 @@ namespace DotSights.Dashboard.ViewModels
 		[ObservableProperty]
 		private bool _groupItemsUsingGroupingRules;
 
+		[ObservableProperty]
+		private TimeSpan _trackerSaveDelay;
+
 		public ObservableCollection<GroupingRule> GroupingRules { get => _groupingRules; set => this.SetProperty(ref _groupingRules, value); }
 		private ObservableCollection<GroupingRule> _groupingRules = new();
 
@@ -28,6 +32,7 @@ namespace DotSights.Dashboard.ViewModels
 			GroupItemsWithSameProcessName = settings.GroupItemsWithSameProcessName;
 			GroupItemsUsingGroupingRules = settings.GroupItemsUsingGroupingRules;
 			GroupingRules = new(settings.GroupingRules);
+			TrackerSaveDelay = settings.TrackerSaveInterval;
 		}
 
 		[RelayCommand]

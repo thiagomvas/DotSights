@@ -7,6 +7,11 @@
              x:Class="DotSights.Dashboard.Views.SettingsPageView"
 			 x:DataType="vm:SettingsPageViewModel">
 	<StackPanel>
+		<TextBlock Classes="h1">Tracker Settings</TextBlock>
+		<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+			<TextBlock VerticalAlignment="Center">Tracker saving delay</TextBlock>
+			<TimePicker SelectedTime="{Binding TrackerSaveDelay}" />
+		</StackPanel>
 		<TextBlock Classes="h1">Dashboard Data</TextBlock>
 		<CheckBox Content="Group usage by process names" IsChecked="{Binding GroupItemsWithSameProcessName}"/>
 		<TextBlock Classes="h1">Advanced Settings</TextBlock>

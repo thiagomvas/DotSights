@@ -7,22 +7,31 @@
              x:Class="DotSights.Dashboard.Views.SettingsPageView"
 			 x:DataType="vm:SettingsPageViewModel">
 	<StackPanel>
+		<TextBlock Classes="h1">Dashboard Data</TextBlock>
 		<CheckBox Content="Group usage by process names" IsChecked="{Binding GroupItemsWithSameProcessName}"/>
-		<CheckBox Content="Group usage by grouping rules" IsChecked="{Binding GroupItemsUsingGroupingRules}"/>
-		<ListBox ItemsSource="{Binding GroupingRules}" DataContext="{Binding}">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<StackPanel Orientation="Horizontal">
-						<TextBox Text="{Binding Name}"/>
-						<TextBox Text="{Binding RegexQuery}"/>
-						<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveRule}" CommandParameter="{Binding}">
-							<PathIcon Data="{StaticResource delete_regular}"/>	
-						</Button>
-					</StackPanel>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-		<Button Command="{Binding AddRule}">Add Rule</Button>
+		<TextBlock Classes="h1">Advanced Settings</TextBlock>
+		<CheckBox Content="Group usage with Regex rules" IsChecked="{Binding GroupItemsUsingGroupingRules}"/>
+		<Border Classes="ContentBorder">
+			<StackPanel>
+				<TextBlock Classes="h2">Grouping Rules</TextBlock>
+				<ListBox ItemsSource="{Binding GroupingRules}" DataContext="{Binding}" Background="Transparent">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+								<TextBlock VerticalAlignment="Center">Display as </TextBlock>
+								<TextBox Text="{Binding Name}" Watermark="Something cool..." MinWidth="100"/>
+								<TextBlock VerticalAlignment="Center">Regex Pattern: </TextBlock>
+								<TextBox Text="{Binding RegexQuery}" Watermark="Something no one understands..." MinWidth="100"/>
+								<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveRule}" CommandParameter="{Binding}">
+									<PathIcon Data="{StaticResource delete_regular}"/>
+								</Button>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				<Button Command="{Binding AddRule}">Add Rule</Button>
+			</StackPanel>
+		</Border>
 		<Button Content="Save Settings" Command="{Binding SaveSettings}"/>
 	</StackPanel>
 </UserControl>

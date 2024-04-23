@@ -34,7 +34,7 @@ namespace DotSights.Dashboard.ViewModels
 		public void SaveSettings()
 		{
 			var service = ConfigurationService.Instance;
-			var settings = new DashboardSettings
+			var settings = new DotSightsSettings
 			{
 				GroupItemsWithSameProcessName = GroupItemsWithSameProcessName,
 				GroupItemsUsingGroupingRules = GroupItemsUsingGroupingRules,

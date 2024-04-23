@@ -33,32 +33,32 @@ namespace DotSights.Dashboard.Services
 			}
 		}
 
-		public DashboardSettings DashboardSettings = new();
+		public DotSightsSettings DashboardSettings = new();
 		public bool HasLoaded = false;
 
 		// Save settings file to json
-		public void SaveSettings(DashboardSettings settings)
+		public void SaveSettings(DotSightsSettings settings)
 		{
 			DashboardSettings = settings;
 			var json = JsonConvert.SerializeObject(settings);
 			File.WriteAllText("settings.json", json);
 		}
 
-		public DashboardSettings LoadSettings()
+		public DotSightsSettings LoadSettings()
 		{
 			if (!File.Exists("settings.json"))
 			{
-				DashboardSettings = new DashboardSettings();
-				return new DashboardSettings();
+				DashboardSettings = new DotSightsSettings();
+				return new DotSightsSettings();
 			}
 
 			var json = File.ReadAllText("settings.json");
 
-			var settings = JsonConvert.DeserializeObject<DashboardSettings>(json);
+			var settings = JsonConvert.DeserializeObject<DotSightsSettings>(json);
 			if(settings == null)
 			{
-				DashboardSettings = new DashboardSettings();
-				return new DashboardSettings();
+				DashboardSettings = new DotSightsSettings();
+				return new DotSightsSettings();
 			}
 			
 			DashboardSettings = settings;

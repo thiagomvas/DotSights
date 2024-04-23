@@ -1,9 +1,12 @@
+using DotSights.Core;
 using DotSights.Core.Common.Types;
+using DotSights.Dashboard.Models;
 
 namespace DotSights.Tracker
 {
 	public class Worker : BackgroundService
 	{
+		private DotSightsSettings settings = new();
 		private readonly ILogger<Worker> _logger;
 		private string logFilePath = "DotSightsLog.txt";
 		private string dataFilePath = "DotSightsData.json";
@@ -11,10 +14,10 @@ namespace DotSights.Tracker
 		private Dictionary<string, ActivityData> trackedData = new();
 
 		int ciclesSinceSave = 0; // 1 cycle = 1 second
-		int saveCicleDelay = 5; // Save every 5 minutes ( 60 seconds * 5 )
 		public Worker(ILogger<Worker> logger)
 		{
 			_logger = logger;
+			settings = Core.DotSights.LoadSettings();
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -52,7 +55,7 @@ namespace DotSights.Tracker
 					trackedData.Add(currentWindow, activity);
 				}
 
-				if(ciclesSinceSave >= saveCicleDelay)
+				if(ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
 				{
 					SaveData(null);
 					ciclesSinceSave = 0;

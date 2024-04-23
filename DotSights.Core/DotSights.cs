@@ -1,5 +1,6 @@
 ﻿using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
+using DotSights.Dashboard.Models;
 using ScottPlot;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -46,6 +47,20 @@ public static class DotSights
 		return "";
 	}
 
+	public static void SaveSettings(DotSightsSettings settings)
+	{
+		File.WriteAllText("settings.json", JsonSerializer.Serialize(settings, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
+	}
+
+	public static DotSightsSettings LoadSettings()
+	{
+		if (File.Exists("settings.json"))
+		{
+			string data = File.ReadAllText("settings.json");
+			return JsonSerializer.Deserialize(data, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default) as DotSightsSettings;
+		}
+		return new DotSightsSettings();
+	}
 	public static string SerializeData(List<ActivityData> data)
 	{
 		return JsonSerializer.Serialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default);

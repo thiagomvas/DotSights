@@ -14,6 +14,7 @@ namespace DotSights.Dashboard.Models
 
 		#region Tracker Settings
 		public TimeSpan TrackerSaveInterval { get; set; } = TimeSpan.FromMinutes(15);
+		public bool OptimizeForStorageSpace { get; set; } = false;
 		#endregion
 	}
 }

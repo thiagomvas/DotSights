@@ -24,6 +24,10 @@ namespace DotSights.Dashboard.ViewModels
 		[ObservableProperty]
 		private bool _runOnStartup;
 
+		[ObservableProperty]
+
+		private bool _optimizeForStorageSpace;
+
 		partial void OnRunOnStartupChanged(bool oldValue, bool newValue)
 		{
 			if (newValue)
@@ -49,6 +53,8 @@ namespace DotSights.Dashboard.ViewModels
 			GroupingRules = new(settings.GroupingRules);
 			TrackerSaveDelay = settings.TrackerSaveInterval;
 			RunOnStartup = StartupService.IsStartup();
+			OptimizeForStorageSpace = settings.OptimizeForStorageSpace;
+
 		}
 
 		[RelayCommand]
@@ -60,7 +66,9 @@ namespace DotSights.Dashboard.ViewModels
 				GroupItemsWithSameProcessName = GroupItemsWithSameProcessName,
 				GroupItemsUsingGroupingRules = GroupItemsUsingGroupingRules,
 				GroupingRules = GroupingRules.ToList(),
-				TrackerSaveInterval = TrackerSaveDelay
+				TrackerSaveInterval = TrackerSaveDelay,
+				OptimizeForStorageSpace = OptimizeForStorageSpace
+
 			};
 			service.SaveSettings(settings);
 		}

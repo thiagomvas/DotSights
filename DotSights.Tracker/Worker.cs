@@ -43,16 +43,17 @@ namespace DotSights.Tracker
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				string currentWindow = Core.DotSights.GetFocusedWindow();
-				if (trackedData.ContainsKey(currentWindow))
+				string searchKey = settings.OptimizeForStorageSpace ? Core.DotSights.GetFocusedProcessName() : currentWindow;
+				if (trackedData.ContainsKey(searchKey))
 				{
-					trackedData[currentWindow]++;
+					trackedData[searchKey]++;
 				}
 				else
 				{
 					var activity = new ActivityData(currentWindow);
 					activity.ProcessName = Core.DotSights.GetFocusedProcessName();
 					activity++;
-					trackedData.Add(currentWindow, activity);
+					trackedData.Add(searchKey, activity);
 				}
 
 				if(ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)

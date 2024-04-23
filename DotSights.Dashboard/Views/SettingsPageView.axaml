@@ -38,6 +38,9 @@
 				<Button Command="{Binding AddRule}">Add Rule</Button>
 			</StackPanel>
 		</Border>
+		<TextBlock Classes="h3">Storage optimization</TextBlock>
+		<TextBlock TextWrapping="Wrap">By enabling the following, the tracker will only register new entries based on the process name instead of window title. Use this if you do not need detailed information or need to save storage space</TextBlock>
+		<CheckBox Content="Optimize storage by using process names" IsChecked="{Binding OptimizeForStorageSpace}"/>
 		<Button Content="Save Settings" Command="{Binding SaveSettings}"/>
 	</StackPanel>
 </UserControl>

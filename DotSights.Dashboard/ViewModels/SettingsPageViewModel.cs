@@ -21,6 +21,21 @@ namespace DotSights.Dashboard.ViewModels
 		[ObservableProperty]
 		private TimeSpan _trackerSaveDelay;
 
+		[ObservableProperty]
+		private bool _runOnStartup;
+
+		partial void OnRunOnStartupChanged(bool oldValue, bool newValue)
+		{
+			if (newValue)
+			{
+				StartupService.SetStartup();
+			}
+			else
+			{
+				StartupService.RemoveStartup();
+			}
+		}
+
 		public ObservableCollection<GroupingRule> GroupingRules { get => _groupingRules; set => this.SetProperty(ref _groupingRules, value); }
 		private ObservableCollection<GroupingRule> _groupingRules = new();
 
@@ -33,6 +48,7 @@ namespace DotSights.Dashboard.ViewModels
 			GroupItemsUsingGroupingRules = settings.GroupItemsUsingGroupingRules;
 			GroupingRules = new(settings.GroupingRules);
 			TrackerSaveDelay = settings.TrackerSaveInterval;
+			RunOnStartup = StartupService.IsStartup();
 		}
 
 		[RelayCommand]
@@ -43,8 +59,9 @@ namespace DotSights.Dashboard.ViewModels
 			{
 				GroupItemsWithSameProcessName = GroupItemsWithSameProcessName,
 				GroupItemsUsingGroupingRules = GroupItemsUsingGroupingRules,
-				GroupingRules = GroupingRules.ToList()
-		};
+				GroupingRules = GroupingRules.ToList(),
+				TrackerSaveInterval = TrackerSaveDelay
+			};
 			service.SaveSettings(settings);
 		}
 

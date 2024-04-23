@@ -12,6 +12,7 @@
 			<TextBlock VerticalAlignment="Center">Tracker saving delay</TextBlock>
 			<TimePicker SelectedTime="{Binding TrackerSaveDelay}" />
 		</StackPanel>
+		<CheckBox Content="Start tracker on system startup" IsChecked="{Binding RunOnStartup}"/>
 		<TextBlock Classes="h1">Dashboard Data</TextBlock>
 		<CheckBox Content="Group usage by process names" IsChecked="{Binding GroupItemsWithSameProcessName}"/>
 		<TextBlock Classes="h1">Advanced Settings</TextBlock>

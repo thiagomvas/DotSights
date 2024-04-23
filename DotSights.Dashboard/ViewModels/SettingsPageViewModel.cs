@@ -25,8 +25,13 @@ namespace DotSights.Dashboard.ViewModels
 		private bool _runOnStartup;
 
 		[ObservableProperty]
-
 		private bool _optimizeForStorageSpace;
+
+		[ObservableProperty]
+		private bool _regexMatchesOnly;
+
+		[ObservableProperty]
+		private bool _regexMatchProcessName;
 
 		partial void OnRunOnStartupChanged(bool oldValue, bool newValue)
 		{
@@ -54,6 +59,8 @@ namespace DotSights.Dashboard.ViewModels
 			TrackerSaveDelay = settings.TrackerSaveInterval;
 			RunOnStartup = StartupService.IsStartup();
 			OptimizeForStorageSpace = settings.OptimizeForStorageSpace;
+			RegexMatchesOnly = settings.ShowOnlyRegexMatchedItems;
+			RegexMatchProcessName = settings.RegexMatchProcessName;
 
 		}
 
@@ -67,7 +74,9 @@ namespace DotSights.Dashboard.ViewModels
 				GroupItemsUsingGroupingRules = GroupItemsUsingGroupingRules,
 				GroupingRules = GroupingRules.ToList(),
 				TrackerSaveInterval = TrackerSaveDelay,
-				OptimizeForStorageSpace = OptimizeForStorageSpace
+				OptimizeForStorageSpace = OptimizeForStorageSpace,
+				ShowOnlyRegexMatchedItems = RegexMatchesOnly,
+				RegexMatchProcessName = RegexMatchProcessName
 
 			};
 			service.SaveSettings(settings);

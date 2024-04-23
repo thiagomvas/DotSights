@@ -1,6 +1,4 @@
 ﻿using DotSights.Core.Common.Types;
-using System;
-using System.Collections.Generic;
 
 namespace DotSights.Dashboard.Models
 {
@@ -10,6 +8,8 @@ namespace DotSights.Dashboard.Models
 		public bool GroupItemsWithSameProcessName { get; set; } = true;
 		public bool GroupItemsUsingGroupingRules { get; set; } = false;
 		public List<GroupingRule> GroupingRules { get; set; } = new();
+		public bool ShowOnlyRegexMatchedItems { get; set; } = false;
+		public bool RegexMatchProcessName { get; set; } = false;
 		#endregion
 
 		#region Tracker Settings

@@ -5,6 +5,7 @@ using ScottPlot;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DotSights.Core;
 
@@ -163,6 +164,69 @@ public static class DotSights
 		plot3.SaveBmp("ScatterPlot.bmp", 1920, 540);
 
 
+	}
+	public static List<ActivityData> FilterDataFromRules(List<ActivityData> data, DotSightsSettings settings)
+	{
+		List<ActivityData> matches = new();
+		List<ActivityData> matchedItems = new();
+
+		foreach(var rule in settings.GroupingRules)
+		{
+			Regex regex = new(rule.RegexQuery, RegexOptions.IgnoreCase);
+			ActivityData? match = null;
+			foreach(var item in data)
+			{
+				if (regex.IsMatch(item.WindowTitle))
+				{
+					if(match == null)
+						match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
+					match += item;
+
+					if (!matchedItems.Contains(item))
+						matchedItems.Add(item); 
+				}
+				else if(settings.RegexMatchProcessName && regex.IsMatch(item.ProcessName))
+				{
+					if (match == null)
+						match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
+					match += item;
+
+					if (!matchedItems.Contains(item))
+						matchedItems.Add(item);
+				}
+			}
+			if (match is not null) matches.Add(match);
+		}
+
+		if(settings.ShowOnlyRegexMatchedItems)
+			return matches;
+		else return data.Except(matchedItems).Concat(matches).ToList();
+
+	}
+	public static List<ActivityData> FilterDataFromSettings(List<ActivityData> data, DotSightsSettings settings)
+	{
+		List<ActivityData> result = data.Select(x => x).ToList();
+
+		// Group data with the same process name together
+		if (settings.GroupItemsWithSameProcessName)
+		{
+			result = result.GroupBy(x => x.ProcessName).Select(x => new ActivityData
+			{
+				WindowTitle = x.First().WindowTitle,
+				FocusedTimeInSeconds = x.Sum(y => y.FocusedTimeInSeconds),
+				UsageTimePerWeekDay = x.SelectMany(y => y.UsageTimePerWeekDay).GroupBy(y => y.Key).ToDictionary(y => y.Key, y => y.Sum(z => z.Value)),
+				UsageTimePerHour = x.SelectMany(y => y.UsageTimePerHour).GroupBy(y => y.Key).ToDictionary(y => y.Key, y => y.Sum(z => z.Value)),
+				UsageTimePerMonth = x.SelectMany(y => y.UsageTimePerMonth).GroupBy(y => y.Key).ToDictionary(y => y.Key, y => y.Sum(z => z.Value)),
+				Alias = x.First().Alias,
+				ProcessName = x.First().ProcessName,
+				Last7DaysUsage = x.SelectMany(y => y.Last7DaysUsage).GroupBy(y => y.Key).ToDictionary(y => y.Key, y => y.Sum(z => z.Value))
+			}).ToList();
+		}
+
+		if(settings.GroupItemsUsingGroupingRules && settings.GroupingRules.Count > 0)
+			result = FilterDataFromRules(result, settings);
+
+		return result;
 	}
 }
 

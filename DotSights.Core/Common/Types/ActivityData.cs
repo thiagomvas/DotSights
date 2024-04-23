@@ -220,7 +220,7 @@ namespace DotSights.Core.Common.Types
 		}
 
 
-		public static List<ActivityData> GroupByRule(IEnumerable<ActivityData> activityDataList, GroupingRule rule)
+		public static List<ActivityData> GroupByRule(IEnumerable<ActivityData> activityDataList, GroupingRule rule, bool includeUnmatched = true, bool matchProcessNames = false)
 		{
 			List<ActivityData> groupedDataList = new List<ActivityData>();
 			List<ActivityData> unmatchedDataList = new List<ActivityData>();
@@ -248,6 +248,21 @@ namespace DotSights.Core.Common.Types
 						mergedData += data;
 					}
 				}
+				else if(matchProcessNames && regex.IsMatch(data.ProcessName))
+				{
+					// If this is the first matching data, initialize mergedData
+					if (mergedData == null)
+					{
+						mergedData = data;
+						mergedData.WindowTitle = rule.Name;
+					}
+					else
+					{
+						// Merge the current data with the existing mergedData
+						mergedData += data;
+					}
+
+				}
 				else
 				{
 					// Add unmatched data to the unmatched list
@@ -262,7 +277,8 @@ namespace DotSights.Core.Common.Types
 			}
 
 			// Add the unmatched data to the groupedDataList
-			groupedDataList.AddRange(unmatchedDataList);
+			if(includeUnmatched) 
+				groupedDataList.AddRange(unmatchedDataList);
 
 			return groupedDataList;
 		}

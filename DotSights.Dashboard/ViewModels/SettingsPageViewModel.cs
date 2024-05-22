@@ -33,17 +33,6 @@ namespace DotSights.Dashboard.ViewModels
 		[ObservableProperty]
 		private bool _regexMatchProcessName;
 
-		partial void OnRunOnStartupChanged(bool oldValue, bool newValue)
-		{
-			if (newValue)
-			{
-				StartupService.SetStartup();
-			}
-			else
-			{
-				StartupService.RemoveStartup();
-			}
-		}
 
 		public ObservableCollection<GroupingRule> GroupingRules { get => _groupingRules; set => this.SetProperty(ref _groupingRules, value); }
 		private ObservableCollection<GroupingRule> _groupingRules = new();
@@ -57,7 +46,6 @@ namespace DotSights.Dashboard.ViewModels
 			GroupItemsUsingGroupingRules = settings.GroupItemsUsingGroupingRules;
 			GroupingRules = new(settings.GroupingRules);
 			TrackerSaveDelay = settings.TrackerSaveInterval;
-			RunOnStartup = StartupService.IsStartup();
 			OptimizeForStorageSpace = settings.OptimizeForStorageSpace;
 			RegexMatchesOnly = settings.ShowOnlyRegexMatchedItems;
 			RegexMatchProcessName = settings.RegexMatchProcessName;

@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="clr-namespace:DotSights.Dashboard.ViewModels;assembly=DotSights.Dashboard"
+    xmlns:vm="clr-namespace:DotSights.Dashboard.ViewModels;assembly=DotSights.Dashboard"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DotSights.Dashboard.Views.SettingsPageView"
-			 x:DataType="vm:SettingsPageViewModel">
+    x:DataType="vm:SettingsPageViewModel">
 	<StackPanel>
 		<TextBlock Classes="h1">Tracker Settings</TextBlock>
 		<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
@@ -29,7 +29,7 @@
 								<TextBox Text="{Binding Name}" Watermark="Something cool..." MinWidth="100"/>
 								<TextBlock VerticalAlignment="Center">Regex Pattern: </TextBlock>
 								<TextBox Text="{Binding RegexQuery}" Watermark="Something no one understands..." MinWidth="100"/>
-								<CheckBox Content="Show group on dashb" IsChecked="{Binding ShowOnDashboard}"/>
+								<CheckBox Content="Show matches" IsChecked="{Binding ShowOnDashboard}"/>
 								<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveRule}" CommandParameter="{Binding}">
 									<PathIcon Data="{StaticResource delete_regular}"/>
 								</Button>
@@ -43,6 +43,26 @@
 		<TextBlock Classes="h3">Storage optimization</TextBlock>
 		<TextBlock TextWrapping="Wrap">By enabling the following, the tracker will only register new entries based on the process name instead of window title. Use this if you do not need detailed information or need to save storage space</TextBlock>
 		<CheckBox Content="Optimize storage by using process names" IsChecked="{Binding OptimizeForStorageSpace}"/>
+		<Border IsVisible="{Binding OptimizeForStorageSpace}" Classes="ContentBorder">
+			<StackPanel>
+				<TextBlock Classes="h2">Grouping Rules</TextBlock>
+				<ListBox ItemsSource="{Binding GroupProcessNames}" DataContext="{Binding}" Background="Transparent">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+								<TextBlock VerticalAlignment="Center">Display as </TextBlock>
+								<TextBox Text="{Binding Name}" Watermark="Something cool..." MinWidth="100"/>
+								<TextBlock Text="{Binding Name}"/>
+								<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveProcessName}" CommandParameter="{Binding}">
+									<PathIcon Data="{StaticResource delete_regular}"/>
+								</Button>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				<Button Command="{Binding AddProcessName}">Add Rule</Button>
+			</StackPanel>
+		</Border>
 		<Button Content="Save Settings" Command="{Binding SaveSettings}"/>
 	</StackPanel>
 </UserControl>

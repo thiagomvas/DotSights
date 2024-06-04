@@ -37,7 +37,10 @@ namespace DotSights.Dashboard.ViewModels
 		public ObservableCollection<GroupingRule> GroupingRules { get => _groupingRules; set => this.SetProperty(ref _groupingRules, value); }
 		private ObservableCollection<GroupingRule> _groupingRules = new();
 
+		private ObservableCollection<ProcessName> _groupProcessNames = new();
+		public ObservableCollection<ProcessName> GroupProcessNames { get => _groupProcessNames; set => this.SetProperty(ref _groupProcessNames, value); }
 
+		public List<string> testlist = new();
 		public SettingsPageViewModel()
 		{
 			var service = ConfigurationService.Instance;
@@ -49,6 +52,7 @@ namespace DotSights.Dashboard.ViewModels
 			OptimizeForStorageSpace = settings.OptimizeForStorageSpace;
 			RegexMatchesOnly = settings.ShowOnlyRegexMatchedItems;
 			RegexMatchProcessName = settings.RegexMatchProcessName;
+			GroupProcessNames = new(settings.GroupedProcessNames.Select(x => new ProcessName(x)).ToList());
 
 		}
 
@@ -64,9 +68,11 @@ namespace DotSights.Dashboard.ViewModels
 				TrackerSaveInterval = TrackerSaveDelay,
 				OptimizeForStorageSpace = OptimizeForStorageSpace,
 				ShowOnlyRegexMatchedItems = RegexMatchesOnly,
-				RegexMatchProcessName = RegexMatchProcessName
+				RegexMatchProcessName = RegexMatchProcessName,
+				GroupedProcessNames = GroupProcessNames.Select(x => x.Name).ToList()
 
 			};
+
 			service.SaveSettings(settings);
 		}
 
@@ -80,6 +86,26 @@ namespace DotSights.Dashboard.ViewModels
 		public void RemoveRule(GroupingRule rule)
 		{
 			GroupingRules.Remove(rule);
+		}
+
+		[RelayCommand]
+		public void AddProcessName()
+		{
+			GroupProcessNames.Add(new(""));
+		}
+		[RelayCommand]
+		public void RemoveProcessName(ProcessName processName)
+		{
+			GroupProcessNames.Remove(processName);
+		}
+	}
+	public class ProcessName
+	{
+		public string Name { get; set; }
+
+		public ProcessName(string name)
+		{
+			Name = name;
 		}
 	}
 }

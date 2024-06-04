@@ -21,27 +21,14 @@ namespace DotSights.Tracker
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			string log = $"DotSights Tracker started at {DateTime.Now}";
 			startTime = DateTime.Now;
-			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 			Core.DotSights.AssureSetup();
-			log += "\nDotSights setup completed";
-			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 
 			var data = Core.DotSights.GetDataFromDataPath();
-			log += "\nData file read";
-			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 
 			if(data == null)
 			{
-				log += "\nData file is empty. Creating new data object";
-				File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 				data = new List<ActivityData>();
-			}
-			else
-			{
-				log += "\nData file is not empty. Deserializing data";
-				File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 			}
 
 			foreach (var activity in data!)
@@ -49,13 +36,19 @@ namespace DotSights.Tracker
 				trackedData.Add(activity.WindowTitle, activity);
 			}
 			
-			log += "\nData deserialized. Starting main loop";
-			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				string currentWindow = Core.DotSights.GetFocusedWindow();
-				string searchKey = settings.OptimizeForStorageSpace ? Core.DotSights.GetFocusedProcessName() : currentWindow;
+				string searchKey = currentWindow;
+				if(settings.OptimizeForStorageSpace)
+				{
+					string processName = Core.DotSights.GetFocusedProcessName();
+					if(settings.GroupedProcessNames.Contains(processName))
+					{
+						searchKey = processName;
+					}
+				}
 				if (trackedData.ContainsKey(searchKey))
 				{
 					trackedData[searchKey]++;

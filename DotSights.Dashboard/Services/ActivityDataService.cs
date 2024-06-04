@@ -9,7 +9,6 @@ namespace DotSights.Dashboard.Services
 	{
 		public IEnumerable<ActivityData> GetActivityData()
 		{
-			Core.DotSights.DataFilePath = Path.Combine(Environment.CurrentDirectory, "DotSightsData.json");
 			return Core.DotSights.GetDataFromDataPath();
 		}
 	}

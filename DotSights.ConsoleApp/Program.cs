@@ -8,7 +8,6 @@ class Program
 {
 	public static void Main(string[] args)
 	{
-		DotSights.DataFilePath = @"C:\Users\Thiago\source\repos\DotSights\build\DotSightsData.json";
 		var result = DotSights.GetDataFromDataPath();
 
 		DotSightsSettings settings = new()

@@ -11,7 +11,9 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
-	public static string DataFilePath { get; set; } = "data.json";
+	public static string DataFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights", "DotSights.Data.json");
+	public static string SettingsFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights", "DotSights.Settings.json");
+	public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
 
 	[DllImport("user32.dll")]
 	private static extern IntPtr GetForegroundWindow();
@@ -50,16 +52,17 @@ public static class DotSights
 
 	public static void SaveSettings(DotSightsSettings settings)
 	{
-		File.WriteAllText("settings.json", JsonSerializer.Serialize(settings, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
+		File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(settings, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
 	}
 
 	public static DotSightsSettings LoadSettings()
 	{
-		if (File.Exists("settings.json"))
+		if (File.Exists(SettingsFilePath))
 		{
-			string data = File.ReadAllText("settings.json");
+			string data = File.ReadAllText(SettingsFilePath);
 			return JsonSerializer.Deserialize(data, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default) as DotSightsSettings;
 		}
+		File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(new DotSightsSettings(), typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
 		return new DotSightsSettings();
 	}
 	public static string SerializeData(List<ActivityData> data)
@@ -227,6 +230,22 @@ public static class DotSights
 			result = FilterDataFromRules(result, settings);
 
 		return result;
+	}
+
+	public static void AssureSetup()
+	{
+		if(!Directory.Exists(AppDataPath))
+		{
+			Directory.CreateDirectory(AppDataPath);
+		}
+		if (!Directory.Exists(Path.GetDirectoryName(DataFilePath)))
+		{
+			SaveDataToDataPath(new List<ActivityData>());
+		}
+		if (!Directory.Exists(Path.GetDirectoryName(SettingsFilePath)))
+		{
+			SaveSettings(new DotSightsSettings());
+		}
 	}
 }
 

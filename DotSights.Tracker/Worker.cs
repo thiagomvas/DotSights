@@ -8,8 +8,6 @@ namespace DotSights.Tracker
 	{
 		private DotSightsSettings settings = new();
 		private readonly ILogger<Worker> _logger;
-		private string logFilePath = "DotSightsLog.txt";
-		private string dataFilePath = "DotSightsData.json";
 		private static DateTime startTime;
 		private Dictionary<string, ActivityData> trackedData = new();
 
@@ -18,27 +16,41 @@ namespace DotSights.Tracker
 		{
 			_logger = logger;
 			settings = Core.DotSights.LoadSettings();
+			// Create %AppData%\DotSights folder if it doesn't exist and save data file to that folder
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
+			string log = $"DotSights Tracker started at {DateTime.Now}";
 			startTime = DateTime.Now;
+			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
+			Core.DotSights.AssureSetup();
+			log += "\nDotSights setup completed";
+			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 
-			if (!File.Exists(dataFilePath))
+			var data = Core.DotSights.GetDataFromDataPath();
+			log += "\nData file read";
+			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
+
+			if(data == null)
 			{
-				File.Create(dataFilePath).Close();
+				log += "\nData file is empty. Creating new data object";
+				File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
+				data = new List<ActivityData>();
+			}
+			else
+			{
+				log += "\nData file is not empty. Deserializing data";
+				File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 			}
 
-			var readJson = File.ReadAllText(dataFilePath);
-
-
-			if (Core.DotSights.DeserializeData(readJson, out var loadedData))
+			foreach (var activity in data!)
 			{
-				foreach (var activity in loadedData!)
-				{
-					trackedData.Add(activity.WindowTitle, activity);
-				}
+				trackedData.Add(activity.WindowTitle, activity);
 			}
+			
+			log += "\nData deserialized. Starting main loop";
+			File.WriteAllText(Path.Combine(Core.DotSights.AppDataPath, "DotSights.Log.txt"), log);
 
 			while (!stoppingToken.IsCancellationRequested)
 			{
@@ -56,7 +68,7 @@ namespace DotSights.Tracker
 					trackedData.Add(searchKey, activity);
 				}
 
-				if(ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
+				if (ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
 				{
 					SaveData(null);
 					ciclesSinceSave = 0;
@@ -69,7 +81,7 @@ namespace DotSights.Tracker
 		private void SaveData(object? state)
 		{
 			var json = Core.DotSights.SerializeData(trackedData.Values.ToList());
-			File.WriteAllText(dataFilePath, json);
+			File.WriteAllText(Core.DotSights.DataFilePath, json);
 		}
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{

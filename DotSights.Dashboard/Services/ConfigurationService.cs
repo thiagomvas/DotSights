@@ -1,4 +1,5 @@
-﻿using DotSights.Dashboard.Models;
+﻿using DotSights.Core;
+using DotSights.Dashboard.Models;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -40,26 +41,12 @@ namespace DotSights.Dashboard.Services
 		public void SaveSettings(DotSightsSettings settings)
 		{
 			DashboardSettings = settings;
-			var json = JsonConvert.SerializeObject(settings);
-			File.WriteAllText("settings.json", json);
+			Core.DotSights.SaveSettings(settings);
 		}
 
 		public DotSightsSettings LoadSettings()
 		{
-			if (!File.Exists("settings.json"))
-			{
-				DashboardSettings = new DotSightsSettings();
-				return new DotSightsSettings();
-			}
-
-			var json = File.ReadAllText("settings.json");
-
-			var settings = JsonConvert.DeserializeObject<DotSightsSettings>(json);
-			if(settings == null)
-			{
-				DashboardSettings = new DotSightsSettings();
-				return new DotSightsSettings();
-			}
+			var settings = Core.DotSights.LoadSettings();
 			
 			DashboardSettings = settings;
 			HasLoaded = true;

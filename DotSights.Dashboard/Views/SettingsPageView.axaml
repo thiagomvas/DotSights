@@ -16,9 +16,9 @@
 		<CheckBox Content="Group usage by process names" IsChecked="{Binding GroupItemsWithSameProcessName}"/>
 		<TextBlock Classes="h1">Advanced Settings</TextBlock>
 		<CheckBox Content="Group usage with Regex rules" IsChecked="{Binding GroupItemsUsingGroupingRules}"/>
-		<CheckBox Content="Display only Regex matches" IsChecked="{Binding RegexMatchesOnly}"/>
-		<CheckBox Content="Regex match process names" IsChecked="{Binding RegexMatchProcessName}"/>
-		<Border Classes="ContentBorder">
+		<CheckBox IsVisible="{Binding GroupItemsUsingGroupingRules}" Content="Display only Regex matches" IsChecked="{Binding RegexMatchesOnly}"/>
+		<CheckBox IsVisible="{Binding GroupItemsUsingGroupingRules}" Content="Regex match process names" IsChecked="{Binding RegexMatchProcessName}"/>
+		<Border IsVisible="{Binding GroupItemsUsingGroupingRules}" Classes="ContentBorder">
 			<StackPanel>
 				<TextBlock Classes="h2">Grouping Rules</TextBlock>
 				<ListBox ItemsSource="{Binding GroupingRules}" DataContext="{Binding}" Background="Transparent">
@@ -29,6 +29,7 @@
 								<TextBox Text="{Binding Name}" Watermark="Something cool..." MinWidth="100"/>
 								<TextBlock VerticalAlignment="Center">Regex Pattern: </TextBlock>
 								<TextBox Text="{Binding RegexQuery}" Watermark="Something no one understands..." MinWidth="100"/>
+								<CheckBox Content="Show group on dashb" IsChecked="{Binding ShowOnDashboard}"/>
 								<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveRule}" CommandParameter="{Binding}">
 									<PathIcon Data="{StaticResource delete_regular}"/>
 								</Button>

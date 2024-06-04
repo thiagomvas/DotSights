@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DotSights.Core;
 using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
+using DotSights.Dashboard.Models;
 using DotSights.Dashboard.Services;
 using System;
 using System.Collections.Generic;
@@ -64,14 +65,14 @@ namespace DotSights.Dashboard.ViewModels
 
 		public void SearchCommand()
 		{
-			var result = Core.DotSights.FilterDataFromSettings(data, ConfigurationService.Instance.DashboardSettings);
+			var result = Core.DotSights.FilterDataFromSettings(data, Core.DotSights.LoadSettings());
 			if (string.IsNullOrEmpty(SearchQuery))
 			{
 				ListItems = new ObservableCollection<ActivityData>(result);
 				return;
 			}
 
-			ListItems = new ObservableCollection<ActivityData>(result.Where(x => x.WindowTitle.Contains(SearchQuery)));
+			ListItems = new ObservableCollection<ActivityData>(result.Where(x => x.WindowTitle.Contains(SearchQuery, StringComparison.InvariantCultureIgnoreCase)));
 		}
 	}
 }

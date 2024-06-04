@@ -201,6 +201,9 @@ public static class DotSights
 			if (match is not null) matches.Add(match);
 		}
 
+		// Remove items that have Display set to false
+		matches = matches.Where(x => settings.GroupingRules.First(y => y.Name == x.WindowTitle).ShowOnDashboard).ToList();
+
 		if(settings.ShowOnlyRegexMatchedItems)
 			return matches;
 		else return data.Except(matchedItems).Concat(matches).ToList();

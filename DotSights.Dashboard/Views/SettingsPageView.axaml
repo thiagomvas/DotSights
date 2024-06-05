@@ -41,7 +41,9 @@
 			</StackPanel>
 		</Border>
 		<TextBlock Classes="h3">Storage optimization</TextBlock>
-		<TextBlock TextWrapping="Wrap">By enabling the following, the tracker will only register new entries based on the process name instead of window title. Use this if you do not need detailed information or need to save storage space</TextBlock>
+		<TextBlock TextWrapping="Wrap">By enabling the following, the tracker will only register new entries based on the process name instead of only the window title, this means that specified processes will be grouped together, no matter what the window is called.</TextBlock>
+		<TextBlock TextWrapping="Wrap">However, it is possible to obtain specific data from some services. For example it is possible to use Regex Rules to obtain what project you are working on in Visual Studio and group by that instead.</TextBlock>
+		<TextBlock TextWrapping="Wrap">By toggling this you cannot do that. Use this feature if you want to save storage space or don't need detailed information.</TextBlock>
 		<CheckBox Content="Optimize storage by using process names" IsChecked="{Binding OptimizeForStorageSpace}"/>
 		<Border IsVisible="{Binding OptimizeForStorageSpace}" Classes="ContentBorder">
 			<StackPanel>
@@ -50,9 +52,8 @@
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-								<TextBlock VerticalAlignment="Center">Display as </TextBlock>
+								<TextBlock VerticalAlignment="Center">Process Name</TextBlock>
 								<TextBox Text="{Binding Name}" Watermark="Something cool..." MinWidth="100"/>
-								<TextBlock Text="{Binding Name}"/>
 								<Button Command="{Binding $parent[ListBox].((vm:SettingsPageViewModel)DataContext).RemoveProcessName}" CommandParameter="{Binding}">
 									<PathIcon Data="{StaticResource delete_regular}"/>
 								</Button>

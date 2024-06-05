@@ -3,6 +3,7 @@ using DotSights.Core.Common.Utils;
 using DotSights.Dashboard.Models;
 using ScottPlot;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -11,9 +12,10 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
-	public static string DataFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights", "DotSights.Data.json");
-	public static string SettingsFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights", "DotSights.Settings.json");
 	public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
+	public static string DataFilePath => Path.Combine(AppDataPath, "DotSights.Data.json");
+	public static string SettingsFilePath => Path.Combine(AppDataPath, "DotSights.Settings.json");
+	public static string TrackerFilePath => Path.Combine(AppDataPath, "DotSights.Tracker.exe");
 
 	[DllImport("user32.dll")]
 	private static extern IntPtr GetForegroundWindow();
@@ -60,7 +62,9 @@ public static class DotSights
 		if (File.Exists(SettingsFilePath))
 		{
 			string data = File.ReadAllText(SettingsFilePath);
-			return JsonSerializer.Deserialize(data, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default) as DotSightsSettings;
+			var result = JsonSerializer.Deserialize(data, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default) as DotSightsSettings;
+			result.GroupedProcessNames = result.GroupedProcessNames.Select(x => x.ToLower()).ToList();
+			return result;
 		}
 		File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(new DotSightsSettings(), typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
 		return new DotSightsSettings();
@@ -249,6 +253,26 @@ public static class DotSights
 		{
 			SaveSettings(new DotSightsSettings());
 		}
+	}
+
+	public static void SetTrackerToStartup()
+	{
+		File.Copy(TrackerFilePath, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "DotSights.Tracker.exe"), true);
+	}
+
+	public static void RemoveTrackerFromStartup()
+	{
+		File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "DotSights.Tracker.exe"));
+	}
+
+	public static bool IsTrackerInStartup()
+	{
+		return File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "DotSights.Tracker.exe"));
+	}
+
+	public static void CopyTrackerToAppdata(string path)
+	{
+		File.Copy(path, TrackerFilePath, true);
 	}
 }
 

@@ -1,6 +1,8 @@
 using DotSights.Core;
 using DotSights.Core.Common.Types;
 using DotSights.Dashboard.Models;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace DotSights.Tracker
 {
@@ -24,9 +26,10 @@ namespace DotSights.Tracker
 			startTime = DateTime.Now;
 			Core.DotSights.AssureSetup();
 
+
 			var data = Core.DotSights.GetDataFromDataPath();
 
-			if(data == null)
+			if (data == null)
 			{
 				data = new List<ActivityData>();
 			}
@@ -35,30 +38,29 @@ namespace DotSights.Tracker
 			{
 				trackedData.Add(activity.WindowTitle, activity);
 			}
-			
+
 
 			while (!stoppingToken.IsCancellationRequested)
 			{
 				string currentWindow = Core.DotSights.GetFocusedWindow();
 				string searchKey = currentWindow;
-				if(settings.OptimizeForStorageSpace)
+				var processName = Core.DotSights.GetFocusedProcessName().ToLower();
+				if (settings.OptimizeForStorageSpace && settings.GroupedProcessNames.Contains(processName))
 				{
-					string processName = Core.DotSights.GetFocusedProcessName();
-					if(settings.GroupedProcessNames.Contains(processName))
+					var match = trackedData.Values.Where(x => x.ProcessName.ToLower() == processName.ToLower()).FirstOrDefault();
+					if (match != null)
 					{
-						searchKey = processName;
+						searchKey = match.WindowTitle;
 					}
 				}
+				 
 				if (trackedData.ContainsKey(searchKey))
 				{
 					trackedData[searchKey]++;
 				}
 				else
 				{
-					var activity = new ActivityData(currentWindow);
-					activity.ProcessName = Core.DotSights.GetFocusedProcessName();
-					activity++;
-					trackedData.Add(searchKey, activity);
+					RegisterNewActivity(searchKey);
 				}
 
 				if (ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
@@ -80,6 +82,14 @@ namespace DotSights.Tracker
 		{
 			SaveData(null);
 			return base.StopAsync(cancellationToken);
+		}
+
+		private void RegisterNewActivity(string windowTitle)
+		{
+			var activity = new ActivityData(windowTitle);
+			activity.ProcessName = Core.DotSights.GetFocusedProcessName();
+			activity++;
+			trackedData.Add(windowTitle, activity);
 		}
 	}
 }

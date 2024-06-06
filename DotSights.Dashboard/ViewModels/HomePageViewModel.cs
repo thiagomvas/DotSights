@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DotSights.Core;
 using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
@@ -10,11 +11,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Transactions;
 
 namespace DotSights.Dashboard.ViewModels
 {
 	public partial class HomePageViewModel : ViewModelBase
 	{
+		private static HomePageViewModel? _instance;
+		public static HomePageViewModel Instance => _instance ??= new HomePageViewModel();
+
 		[ObservableProperty]
 		private string _searchQuery = "";
 
@@ -30,14 +35,15 @@ namespace DotSights.Dashboard.ViewModels
 		[ObservableProperty]
 		private string _totalTimeThisWeek = "";
 
-		public ObservableCollection<ActivityData> ListItems { get => _listItems; set => this.SetProperty(ref _listItems, value); }
-		private ObservableCollection<ActivityData> _listItems = new();
+		[ObservableProperty]
+		private ObservableCollection<ActivityDataWrapper> _listItems;
 
 		private List<ActivityData> data = new();
 
 		private static string FolderPath = Environment.CurrentDirectory;
 		private const string hourlyuseplotfilename = "HourlyTimeUsagePlot.png";
 		private const string foucsedtimeplotfilename = "FocusedTimePlot.png";
+		private const string dataChart1 = "DataChart1.png";
 
 		public HomePageViewModel()
 		{
@@ -47,8 +53,7 @@ namespace DotSights.Dashboard.ViewModels
 			if (activities == null || activities.Count == 0)
 				return;
 
-			// Initialize ListItems using the new keyword
-			_listItems = new ObservableCollection<ActivityData>(activities);
+			ListItems = new ObservableCollection<ActivityDataWrapper>(activities.Select(e => new ActivityDataWrapper(e)));
 			data = activities;
 
 			SearchCommand();
@@ -68,11 +73,55 @@ namespace DotSights.Dashboard.ViewModels
 			var result = Core.DotSights.FilterDataFromSettings(data, Core.DotSights.LoadSettings());
 			if (string.IsNullOrEmpty(SearchQuery))
 			{
-				ListItems = new ObservableCollection<ActivityData>(result);
+				ListItems = new ObservableCollection<ActivityDataWrapper>(result.Select(e => new ActivityDataWrapper(e)));
 				return;
 			}
 
-			ListItems = new ObservableCollection<ActivityData>(result.Where(x => x.WindowTitle.Contains(SearchQuery, StringComparison.InvariantCultureIgnoreCase)));
+			ListItems = new ObservableCollection<ActivityDataWrapper>(result.Where(x => x.WindowTitle.Contains(SearchQuery, StringComparison.InvariantCultureIgnoreCase)).Select(e => new ActivityDataWrapper(e)));
+		}
+
+		[RelayCommand]
+		public void SelectDataCommand(ActivityDataWrapper wrapper)
+		{
+			if(!wrapper.Selected)
+			{
+				Core.DotSights.CreateDataChartForActivity(wrapper.Data);
+				wrapper.FetchCharts();
+			}
+			List<ActivityDataWrapper> list = new List<ActivityDataWrapper>();
+			foreach (var item in ListItems)
+			{
+				item.Selected = item == wrapper ? !item.Selected : false;
+				list.Add(item);
+			}
+			ListItems = new ObservableCollection<ActivityDataWrapper>(list);
+		}
+
+	}
+
+	public partial class ActivityDataWrapper : ObservableObject
+	{
+		public ActivityData Data { get; set; }
+		public bool Selected { get; set; } = false;
+
+		public Bitmap ActiveHoursChart { get; set; } 
+		public Bitmap ActiveDaysChart { get; set; } 
+
+		public ActivityDataWrapper(ActivityData data)
+		{
+			Data = data;
+		}
+
+		[RelayCommand]
+		public void Foo()
+		{
+			HomePageViewModel.Instance.SearchQuery = Data.WindowTitle;
+		}
+
+		public void FetchCharts()
+		{
+			ActiveHoursChart = new Bitmap(Path.Combine(Environment.CurrentDirectory, "ActiveHours.png"));
+			ActiveDaysChart = new Bitmap(Path.Combine(Environment.CurrentDirectory, "ActiveDays.png"));
 		}
 	}
 }

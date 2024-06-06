@@ -5,7 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<OutputType>WinExe</OutputType>
-    <UserSecretsId>dotnet-DotSights.Service-e62b8a4e-b1f0-40c1-89c2-9e8b92475dd2</UserSecretsId>
+	  <AssemblyName>DotSights.Tracker</AssemblyName>
+	  <Authors>Gaxyhs</Authors>
+	  <Company>Gaxyhs</Company>
+	  <Product>DotSights Tracker</Product>
+	  <Description>DotSights Tracker tracks screen usage in each app to be displayed conveniently in the Dashboard</Description>
   </PropertyGroup>
 
   <ItemGroup>

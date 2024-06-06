@@ -50,22 +50,33 @@
 				<ItemsControl ItemsSource="{Binding ListItems}">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<Button HorizontalAlignment="Stretch">
+							<Button HorizontalAlignment="Stretch" Command="{Binding $parent[ItemsControl].((vm:HomePageViewModel)DataContext).SelectDataCommand}" CommandParameter="{Binding}">
 								<StackPanel>
 									<StackPanel Orientation="Horizontal">
-										<TextBlock FontSize="16" FontWeight="Bold" Text="{Binding WindowTitle}"/>
+										<TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Data.WindowTitle}"/>
 										<TextBlock FontSize="16" FontWeight="Bold" Text=" - " />
-										<TextBlock Foreground="Orange" FontSize="16" FontWeight="Bold" Text="{Binding ProcessName}"/>
+										<TextBlock Foreground="Orange" FontSize="16" FontWeight="Bold" Text="{Binding Data.ProcessName}"/>
 									</StackPanel>
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="Total usage tracked: " />
-										<TextBlock Text="{Binding FormattedTotalUsageTime}"/>
+										<TextBlock Text="{Binding Data.FormattedTotalUsageTime}"/>
 									</StackPanel>
+									<StackPanel IsVisible="{Binding Selected}">
+										<StackPanel>
+											<Image Source="{Binding ActiveHoursChart}" MaxHeight="512"/>
+										</StackPanel>
+										<StackPanel>
+											<Image Source="{Binding ActiveDaysChart}" MaxHeight="512"/>
+										</StackPanel>
+									</StackPanel>
+									
 								</StackPanel>
 							</Button>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
+
+
 			</StackPanel>
 		</Border>
 		<Image Source="{Binding HourlyUseImage}" MaxHeight="500"/>

@@ -162,15 +162,6 @@ public static class DotSights
 
 
 		plot2.SavePng("HourlyTimeUsagePlot.png", 1080, 540);
-
-		Plot plot3 = new();
-
-		double[] vals = [1, 2, 3, 4, 5];
-		plot3.Add.Scatter(vals, vals);
-
-		plot3.SaveBmp("ScatterPlot.bmp", 1920, 540);
-
-
 	}
 	public static List<ActivityData> FilterDataFromRules(List<ActivityData> data, DotSightsSettings settings)
 	{
@@ -273,6 +264,107 @@ public static class DotSights
 	public static void CopyTrackerToAppdata(string path)
 	{
 		File.Copy(path, TrackerFilePath, true);
+	}
+
+	public static void CreateDataChartForActivity(ActivityData data)
+	{
+		GenerateActiveHoursChart(data);
+
+		// Active day of the week
+		GenerateActiveDaysChart(data);
+	}
+
+	private static void GenerateActiveDaysChart(ActivityData data)
+	{
+		Plot plot2 = new();
+
+		plot2.Title("Most Active Days", 20);
+
+		var dayUsageInSeconds = Enumerable.Range(0, 7).Select(day => data.UsageTimePerWeekDay.ContainsKey((DayOfWeek)day) ? (double)data.UsageTimePerWeekDay[(DayOfWeek)day] : 0).ToArray();
+
+		double[] plotValues2 = new double[7];
+
+		if (dayUsageInSeconds.Any(x => x >= 3600))
+		{
+			plotValues2 = dayUsageInSeconds.Select(x => x / 3600).ToArray();
+		}
+		else if (dayUsageInSeconds.Any(x => x >= 60))
+		{
+			plotValues2 = dayUsageInSeconds.Select(x => x / 60).ToArray();
+		}
+		else
+		{
+			plotValues2 = dayUsageInSeconds;
+		}
+
+		var barPlot2 = plot2.Add.Bars(Enumerable.Range(0, 7).Select(e => (double)e).ToArray(), plotValues2);
+
+		plot2.FigureBackground.Color = Color.FromHex("#00000000");
+
+		plot2.Axes.Color(Color.FromHex("#FFFFFF"));
+
+		plot2.Axes.Margins(0, 0, 0);
+
+		ScottPlot.TickGenerators.NumericAutomatic gen2 = new() { LabelFormatter = (val) => ((DayOfWeek)(int)val).ToString().Substring(0, 3) };
+
+		plot2.Axes.Bottom.TickGenerator = gen2;
+
+		barPlot2.ValueLabelStyle.ForeColor = Color.FromHex("#FFFFFF");
+		barPlot2.Color = Color.FromHex("#F68A06");
+
+		var bars2 = barPlot2.Bars.ToList();
+		for (int i = 0; i < 7; i++)
+		{
+			bars2[i].Label = DotFormatting.FormatTimeShort((int)dayUsageInSeconds[i]);
+			bars2[i].BorderLineWidth = 0;
+		}
+
+		plot2.SavePng("ActiveDays.png", 1080, 540);
+	}
+
+	private static void GenerateActiveHoursChart(ActivityData data)
+	{
+		Plot plot1 = new();
+
+		plot1.Title("Most Active Hours", 20);
+		// Get hourly usage and expand to a 24-length array representing each hour
+		var hourlyUsageInSeconds = Enumerable.Range(0, 24).Select(hour => data.UsageTimePerHour.ContainsKey(hour) ? (double)data.UsageTimePerHour[hour] : 0).ToArray();
+
+		double[] plotValues = new double[24];
+		if (hourlyUsageInSeconds.Any(x => x >= 3600))
+		{
+			plotValues = hourlyUsageInSeconds.Select(x => x / 3600).ToArray();
+		}
+		else if (hourlyUsageInSeconds.Any(x => x >= 60))
+		{
+			plotValues = hourlyUsageInSeconds.Select(x => x / 60).ToArray();
+		}
+		else
+		{
+			plotValues = hourlyUsageInSeconds;
+		}
+
+		var barPlot = plot1.Add.Bars(Enumerable.Range(0, 24).Select(e => (double)e).ToArray(), plotValues);
+
+		plot1.FigureBackground.Color = Color.FromHex("#00000000");
+		plot1.Axes.Color(Color.FromHex("#FFFFFF"));
+		plot1.Axes.Margins(0, 0, 0);
+
+		ScottPlot.TickGenerators.NumericAutomatic gen = new() { LabelFormatter = (val) => DotFormatting.FormatHourToComputerClock((int)val) };
+
+		plot1.Axes.Bottom.TickGenerator = gen;
+
+		barPlot.ValueLabelStyle.ForeColor = Color.FromHex("#FFFFFF");
+		barPlot.Color = Color.FromHex("#F68A06");
+
+		var bars = barPlot.Bars.ToList();
+		for (int i = 0; i < 24; i++)
+		{
+			bars[i].Label = DotFormatting.FormatTimeShort((int)hourlyUsageInSeconds[i]);
+			bars[i].BorderLineWidth = 0;
+		}
+
+		plot1.SavePng("ActiveHours.png", 1080, 540);
 	}
 }
 

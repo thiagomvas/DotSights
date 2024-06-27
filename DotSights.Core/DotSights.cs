@@ -1,6 +1,5 @@
 ﻿using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
-using DotSights.Dashboard.Models;
 using ScottPlot;
 using System.Diagnostics;
 using System.Reflection;
@@ -63,7 +62,7 @@ public static class DotSights
 		{
 			string data = File.ReadAllText(SettingsFilePath);
 			var result = JsonSerializer.Deserialize(data, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default) as DotSightsSettings;
-			result.GroupedProcessNames = result.GroupedProcessNames.Select(x => x.ToLower()).ToList();
+			result!.GroupedProcessNames = result.GroupedProcessNames.Select(x => x.ToLower()).ToList();
 			return result;
 		}
 		File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(new DotSightsSettings(), typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
@@ -95,7 +94,7 @@ public static class DotSights
 			string data = File.ReadAllText(DataFilePath);
 			if (DeserializeData(data, out List<ActivityData>? result))
 			{
-				return result;
+				return result ?? new List<ActivityData>();
 			}
 		}
 		return new List<ActivityData>();
@@ -183,7 +182,7 @@ public static class DotSights
 					if (!matchedItems.Contains(item))
 						matchedItems.Add(item); 
 				}
-				else if(settings.RegexMatchProcessName && regex.IsMatch(item.ProcessName))
+				else if(settings.RegexMatchProcessName && regex.IsMatch(item.ProcessName ?? string.Empty))
 				{
 					if (match == null)
 						match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };

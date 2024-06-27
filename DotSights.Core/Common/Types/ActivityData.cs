@@ -230,7 +230,7 @@ namespace DotSights.Core.Common.Types
 			Regex regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
 
 			// Initialize a variable to hold the merged data
-			ActivityData mergedData = null;
+			ActivityData mergedData = new();
 
 			foreach (ActivityData data in activityDataList)
 			{
@@ -248,7 +248,7 @@ namespace DotSights.Core.Common.Types
 						mergedData += data;
 					}
 				}
-				else if(matchProcessNames && regex.IsMatch(data.ProcessName))
+				else if(matchProcessNames && regex.IsMatch(data.ProcessName ?? string.Empty))
 				{
 					// If this is the first matching data, initialize mergedData
 					if (mergedData == null)
@@ -281,6 +281,22 @@ namespace DotSights.Core.Common.Types
 				groupedDataList.AddRange(unmatchedDataList);
 
 			return groupedDataList;
+		}
+
+		public int GetUsageTimeForDay(DateTime date)
+		{
+			return Last7DaysUsage.ContainsKey(date) ? Last7DaysUsage[date] : 0;
+		}
+
+		public int GetUsageTimeXDaysAgo(int daysAgo)
+		{
+			DateTime date = DateTime.Today.AddDays(-daysAgo);
+			return GetUsageTimeForDay(date);
+		}
+
+		public int GetUsageTimeForWeek()
+		{
+			return Last7DaysUsage.Values.Sum();
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿using DotSights.Dashboard.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace DotSights.Core.Common.Types
 {

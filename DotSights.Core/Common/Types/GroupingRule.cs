@@ -2,8 +2,8 @@
 {
 	public class GroupingRule
 	{
-		public string Name { get; set; }
-		public string RegexQuery { get; set; }
+		public string Name { get; set; } = string.Empty;
+		public string RegexQuery { get; set; } = string.Empty;
 		public bool ShowOnDashboard { get; set; } = true;
 	}
 }

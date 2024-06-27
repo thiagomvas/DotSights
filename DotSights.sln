@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotSights.Core", "DotSights
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotSights.Tracker", "DotSights.Tracker\DotSights.Tracker.csproj", "{9136C7A1-DCC7-486E-8B35-2E2084964E26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotSights.Dashboard", "DotSights.Dashboard\DotSights.Dashboard.csproj", "{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotSights.Dashboard", "DotSights.Dashboard\DotSights.Dashboard.csproj", "{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotSights.CLI", "DotSights.CLI\DotSights.CLI.csproj", "{E58EB202-3513-4B71-870A-D10CB8DC9CCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77FB29AB-ED34-4CD4-ADFB-B0E401C0152F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E58EB202-3513-4B71-870A-D10CB8DC9CCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E58EB202-3513-4B71-870A-D10CB8DC9CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E58EB202-3513-4B71-870A-D10CB8DC9CCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E58EB202-3513-4B71-870A-D10CB8DC9CCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

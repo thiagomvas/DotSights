@@ -1,5 +1,5 @@
 ﻿using DotSights.Core;
-using DotSights.Dashboard.Models;
+using DotSights.Core.Common.Types;
 using Newtonsoft.Json;
 using System.IO;
 

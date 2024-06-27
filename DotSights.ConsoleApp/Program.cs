@@ -2,7 +2,7 @@
 namespace DotSights.ConsoleApp;
 
 using DotSights.Core;
-using DotSights.Dashboard.Models;
+using DotSights.Core.Common.Types;
 
 class Program
 {

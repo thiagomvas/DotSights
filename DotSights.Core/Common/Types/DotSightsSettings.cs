@@ -1,6 +1,4 @@
-﻿using DotSights.Core.Common.Types;
-
-namespace DotSights.Dashboard.Models
+﻿namespace DotSights.Core.Common.Types
 {
 	public class DotSightsSettings
 	{
@@ -16,6 +14,8 @@ namespace DotSights.Dashboard.Models
 		public TimeSpan TrackerSaveInterval { get; set; } = TimeSpan.FromMinutes(15);
 		public bool OptimizeForStorageSpace { get; set; } = false;
 		public List<string> GroupedProcessNames { get; set; } = new();
+
+		public string TrackerExeLocation { get; set; } = string.Empty;
 		#endregion
 	}
 }

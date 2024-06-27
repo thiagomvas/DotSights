@@ -1,6 +1,5 @@
 using DotSights.Core;
 using DotSights.Core.Common.Types;
-using DotSights.Dashboard.Models;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -18,6 +17,8 @@ namespace DotSights.Tracker
 		{
 			_logger = logger;
 			settings = Core.DotSights.LoadSettings();
+			settings.TrackerExeLocation = Process.GetCurrentProcess().MainModule.FileName;
+			Core.DotSights.SaveSettings(settings);
 			// Create %AppData%\DotSights folder if it doesn't exist and save data file to that folder
 		}
 
@@ -25,7 +26,6 @@ namespace DotSights.Tracker
 		{
 			startTime = DateTime.Now;
 			Core.DotSights.AssureSetup();
-
 
 			var data = Core.DotSights.GetDataFromDataPath();
 

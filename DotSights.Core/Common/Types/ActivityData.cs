@@ -19,11 +19,11 @@ namespace DotSights.Core.Common.Types
 		{
 			get
 			{
-				if(FocusedTimeInSeconds > 3600)
+				if (FocusedTimeInSeconds > 3600)
 				{
 					return $"{FocusedTimeInSeconds / 3600}h {FocusedTimeInSeconds % 3600 / 60}m {FocusedTimeInSeconds % 60}s";
 				}
-				else if(FocusedTimeInSeconds > 60)
+				else if (FocusedTimeInSeconds > 60)
 				{
 					return $"{FocusedTimeInSeconds / 60}m {FocusedTimeInSeconds % 60}s";
 				}
@@ -200,7 +200,7 @@ namespace DotSights.Core.Common.Types
 		public void EnsureLast7DaysData()
 		{
 			DateTime today = DateTime.Today;
-			DateTime startDate = today.AddDays(-6); 
+			DateTime startDate = today.AddDays(-6);
 			for (DateTime date = startDate; date < today; date = date.AddDays(1))
 			{
 				if (!Last7DaysUsage.ContainsKey(date))
@@ -248,7 +248,7 @@ namespace DotSights.Core.Common.Types
 						mergedData += data;
 					}
 				}
-				else if(matchProcessNames && regex.IsMatch(data.ProcessName ?? string.Empty))
+				else if (matchProcessNames && regex.IsMatch(data.ProcessName ?? string.Empty))
 				{
 					// If this is the first matching data, initialize mergedData
 					if (mergedData == null)
@@ -277,7 +277,7 @@ namespace DotSights.Core.Common.Types
 			}
 
 			// Add the unmatched data to the groupedDataList
-			if(includeUnmatched) 
+			if (includeUnmatched)
 				groupedDataList.AddRange(unmatchedDataList);
 
 			return groupedDataList;

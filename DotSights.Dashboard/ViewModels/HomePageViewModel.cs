@@ -1,17 +1,14 @@
 ﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DotSights.Core;
 using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
-using DotSights.Dashboard.Models;
 using DotSights.Dashboard.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Transactions;
 
 namespace DotSights.Dashboard.ViewModels
 {
@@ -83,7 +80,7 @@ namespace DotSights.Dashboard.ViewModels
 		[RelayCommand]
 		public void SelectDataCommand(ActivityDataWrapper wrapper)
 		{
-			if(!wrapper.Selected)
+			if (!wrapper.Selected)
 			{
 				Core.DotSights.CreateDataChartForActivity(wrapper.Data);
 				wrapper.FetchCharts();
@@ -104,8 +101,8 @@ namespace DotSights.Dashboard.ViewModels
 		public ActivityData Data { get; set; }
 		public bool Selected { get; set; } = false;
 
-		public Bitmap ActiveHoursChart { get; set; } 
-		public Bitmap ActiveDaysChart { get; set; } 
+		public Bitmap ActiveHoursChart { get; set; }
+		public Bitmap ActiveDaysChart { get; set; }
 
 		public ActivityDataWrapper(ActivityData data)
 		{

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DotSights.Core.Common.Types;
-using DotSights.Dashboard.Models;
 using DotSights.Dashboard.Services;
 using System;
 using System.Collections.Generic;

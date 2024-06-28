@@ -1,7 +1,4 @@
-﻿using DotSights.Core;
-using DotSights.Core.Common.Types;
-using Newtonsoft.Json;
-using System.IO;
+﻿using DotSights.Core.Common.Types;
 
 namespace DotSights.Dashboard.Services
 {
@@ -47,7 +44,7 @@ namespace DotSights.Dashboard.Services
 		public DotSightsSettings LoadSettings()
 		{
 			var settings = Core.DotSights.LoadSettings();
-			
+
 			DashboardSettings = settings;
 			HasLoaded = true;
 			return settings;

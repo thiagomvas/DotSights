@@ -2,7 +2,6 @@
 using DotSights.Core.Common.Utils;
 using ScottPlot;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -20,7 +19,7 @@ public static class DotSights
 	private static extern IntPtr GetForegroundWindow();
 
 	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-	private static extern int GetWindowText(IntPtr hWnd, string lpString, int nMaxCount); 
+	private static extern int GetWindowText(IntPtr hWnd, string lpString, int nMaxCount);
 
 	[DllImport("user32.dll")]
 	private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
@@ -167,22 +166,22 @@ public static class DotSights
 		List<ActivityData> matches = new();
 		List<ActivityData> matchedItems = new();
 
-		foreach(var rule in settings.GroupingRules)
+		foreach (var rule in settings.GroupingRules)
 		{
 			Regex regex = new(rule.RegexQuery, RegexOptions.IgnoreCase);
 			ActivityData? match = null;
-			foreach(var item in data)
+			foreach (var item in data)
 			{
 				if (regex.IsMatch(item.WindowTitle))
 				{
-					if(match == null)
+					if (match == null)
 						match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
 					match += item;
 
 					if (!matchedItems.Contains(item))
-						matchedItems.Add(item); 
+						matchedItems.Add(item);
 				}
-				else if(settings.RegexMatchProcessName && regex.IsMatch(item.ProcessName ?? string.Empty))
+				else if (settings.RegexMatchProcessName && regex.IsMatch(item.ProcessName ?? string.Empty))
 				{
 					if (match == null)
 						match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
@@ -198,7 +197,7 @@ public static class DotSights
 		// Remove items that have Display set to false
 		matches = matches.Where(x => settings.GroupingRules.First(y => y.Name == x.WindowTitle).ShowOnDashboard).ToList();
 
-		if(settings.ShowOnlyRegexMatchedItems)
+		if (settings.ShowOnlyRegexMatchedItems)
 			return matches;
 		else return data.Except(matchedItems).Concat(matches).ToList();
 
@@ -223,7 +222,7 @@ public static class DotSights
 			}).ToList();
 		}
 
-		if(settings.GroupItemsUsingGroupingRules && settings.GroupingRules.Count > 0)
+		if (settings.GroupItemsUsingGroupingRules && settings.GroupingRules.Count > 0)
 			result = FilterDataFromRules(result, settings);
 
 		return result;
@@ -231,7 +230,7 @@ public static class DotSights
 
 	public static void AssureSetup()
 	{
-		if(!Directory.Exists(AppDataPath))
+		if (!Directory.Exists(AppDataPath))
 		{
 			Directory.CreateDirectory(AppDataPath);
 		}

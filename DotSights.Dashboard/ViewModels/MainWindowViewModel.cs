@@ -44,8 +44,8 @@ namespace DotSights.Dashboard.ViewModels
 	public class ListItemTemplate
 	{
 		public StreamGeometry Icon { get; set; }
-        public string Label { get; set; }
-        public Type Type { get; set; }
+		public string Label { get; set; }
+		public Type Type { get; set; }
 
 		public ListItemTemplate(string label, Type type, string iconKey)
 		{
@@ -54,5 +54,5 @@ namespace DotSights.Dashboard.ViewModels
 			Application.Current!.TryFindResource(iconKey, out var res);
 			Icon = (StreamGeometry)res!;
 		}
-    }
+	}
 }

@@ -44,28 +44,28 @@ namespace DotSights.CLI.Commands
 
 		private void Execute(bool? groupItemsWithSameProcessName, bool? groupItemsUsingGroupingRules, bool? showOnlyRegexMatchedItems, bool? regexMatchProcessName, int? trackerSaveInterval, bool? optimizeForStorageSpace)
 		{
-			if(groupItemsWithSameProcessName == null && groupItemsUsingGroupingRules == null && showOnlyRegexMatchedItems == null && regexMatchProcessName == null && trackerSaveInterval == null && optimizeForStorageSpace == null)
+			if (groupItemsWithSameProcessName == null && groupItemsUsingGroupingRules == null && showOnlyRegexMatchedItems == null && regexMatchProcessName == null && trackerSaveInterval == null && optimizeForStorageSpace == null)
 			{
 				Console.WriteLine("No changes specified.");
 				return;
 			}
 			var settings = LoadSettings();
-			if(groupItemsWithSameProcessName != null)
+			if (groupItemsWithSameProcessName != null)
 				settings.GroupItemsWithSameProcessName = groupItemsWithSameProcessName.Value;
 
-			if(groupItemsUsingGroupingRules != null)
+			if (groupItemsUsingGroupingRules != null)
 				settings.GroupItemsUsingGroupingRules = groupItemsUsingGroupingRules.Value;
 
-			if(showOnlyRegexMatchedItems != null)
+			if (showOnlyRegexMatchedItems != null)
 				settings.ShowOnlyRegexMatchedItems = showOnlyRegexMatchedItems.Value;
 
-			if(regexMatchProcessName != null)
+			if (regexMatchProcessName != null)
 				settings.RegexMatchProcessName = regexMatchProcessName.Value;
 
-			if(trackerSaveInterval != null)
+			if (trackerSaveInterval != null)
 				settings.TrackerSaveInterval = TimeSpan.FromMinutes(trackerSaveInterval.Value);
 
-			if(optimizeForStorageSpace != null)
+			if (optimizeForStorageSpace != null)
 				settings.OptimizeForStorageSpace = optimizeForStorageSpace.Value;
 
 
@@ -106,14 +106,14 @@ namespace DotSights.CLI.Commands
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Write("(y/n): ");
 				Console.ResetColor();
-				if (Console.ReadLine().ToLower() != "y")
+				if (Console.ReadLine()?.ToLower() != "y")
 				{
 					Console.WriteLine("Aborted.");
 					return;
 				}
 
 				var processes = Process.GetProcessesByName("DotSights.Tracker");
-				foreach(var process in processes)
+				foreach (var process in processes)
 				{
 					try
 					{
@@ -269,7 +269,7 @@ namespace DotSights.CLI.Commands
 
 				private void Execute(string name, string regex, bool showOnDashboard)
 				{
-					if(string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(regex))
+					if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(regex))
 					{
 						Console.ForegroundColor = ConsoleColor.Red;
 						Console.WriteLine("Name and regex query cannot be empty.");
@@ -277,7 +277,7 @@ namespace DotSights.CLI.Commands
 						return;
 					}
 					var settings = LoadSettings();
-					settings.GroupingRules.Add(new() { Name = name, RegexQuery = regex, ShowOnDashboard = showOnDashboard});
+					settings.GroupingRules.Add(new() { Name = name, RegexQuery = regex, ShowOnDashboard = showOnDashboard });
 					SaveSettings(settings);
 					Console.WriteLine("Added new regex rule.");
 				}

@@ -1,8 +1,6 @@
-﻿using DotSights.Core;
-using DotSights.Core.Common.Utils;
+﻿using DotSights.Core.Common.Utils;
 using SharpTables;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using static DotSights.Core.DotSights;
 
 namespace DotSights.CLI.Commands

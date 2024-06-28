@@ -1,7 +1,5 @@
-using DotSights.Core;
 using DotSights.Core.Common.Types;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace DotSights.Tracker
 {
@@ -53,7 +51,7 @@ namespace DotSights.Tracker
 						searchKey = match.WindowTitle;
 					}
 				}
-				 
+
 				if (trackedData.ContainsKey(searchKey))
 				{
 					trackedData[searchKey]++;

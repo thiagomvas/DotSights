@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -8,7 +8,7 @@
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<PackAsTool>True</PackAsTool>
 		<ToolCommandName>DotSights</ToolCommandName>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Description>Screen usage tracker with customizable options. See project repository for instructions.</Description>
 	</PropertyGroup>
 

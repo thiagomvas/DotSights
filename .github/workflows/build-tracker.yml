@@ -29,20 +29,14 @@ jobs:
       run: |
         cd /home/runner/work/DotSights/DotSights/DotSights.Tracker/bin/Release/net8.0/win-x64/publish/ && zip -r client-win-x64.zip *
       
-    - name: Get latest tag
-      id: get_latest_tag
-      run: |
-        LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-        echo "::set-output name=latest_tag::$LATEST_TAG"
-      
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.get_latest_tag.outputs.latest_tag }}
-        release_name: Release ${{ steps.get_latest_tag.outputs.latest_tag }}
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
         draft: false
         prerelease: false
       

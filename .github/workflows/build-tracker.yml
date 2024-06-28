@@ -51,6 +51,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: /home/runner/work/RepoName/RepoName/ProjectName/bin/Release/net5.0/win7-x64/publish/client-win-x64.zip
+        asset_path: /home/runner/work/DotSights/DotSights/DotSights.Tracker/bin/Release/net8.0/win-x64/publish/client-win-x64.zip
         asset_name: client-win-x64.zip
         asset_content_type: application/zip

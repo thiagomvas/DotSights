@@ -23,7 +23,7 @@ jobs:
       run: dotnet restore
 
     - name: Build project
-      run: dotnet publish ./DotSights.Tracker/DotSights.Tracker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./output
+      run: dotnet publish ./DotSights.Tracker/DotSights.Tracker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true
 
     - name: Create win client archive
       run: |

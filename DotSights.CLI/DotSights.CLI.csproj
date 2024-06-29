@@ -8,7 +8,7 @@
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<PackAsTool>True</PackAsTool>
 		<ToolCommandName>DotSights</ToolCommandName>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<Description>Screen usage tracker with customizable options. See project repository for instructions.</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/thiagomvas/DotSights</RepositoryUrl>

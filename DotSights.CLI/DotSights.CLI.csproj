@@ -10,6 +10,8 @@
 		<ToolCommandName>DotSights</ToolCommandName>
 		<Version>1.0.1</Version>
 		<Description>Screen usage tracker with customizable options. See project repository for instructions.</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/thiagomvas/DotSights</RepositoryUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,6 +33,13 @@
 	  <NoWarn>1701;1702;</NoWarn>
 	  <WarningLevel>1</WarningLevel>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="SharpTables" Version="1.1.0" />

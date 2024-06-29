@@ -1,9 +1,11 @@
 ﻿using DotSights.Core.Common.Types;
+using DotSights.Core.Common.Utils;
 using SharpTables;
 using System.Collections;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using static DotSights.Core.DotSights;
 
 namespace DotSights.CLI.Commands
@@ -22,6 +24,7 @@ namespace DotSights.CLI.Commands
 			AddCommand(new PreviewCommand());
 			AddCommand(new RegexCommand());
 			AddCommand(new OpenCommand());
+			AddCommand(new SquashCommand());
 
 			var groupItemsWithSameProcessName = new Option<bool?>(new[] { "--groupprocesses", "-gp" }, "Group items with the same process name");
 			var groupItemsUsingGroupingRules = new Option<bool?>(new[] { "--userules", "-u" }, "Group items using grouping rules");
@@ -330,6 +333,93 @@ namespace DotSights.CLI.Commands
 				catch
 				{
 					Console.WriteLine("Failed to open configuration file.");
+				}
+			}
+		}
+
+		private class SquashCommand : Command
+		{
+			public SquashCommand() : base("squash", "Squash data using grouping rules")
+			{
+				var optionName = new Option<string?>(new[] { "--name", "-n" }, "Name of the rule");
+				var optionRegex = new Option<string?>(new[] { "--regex", "-r" }, "Regex query to match");
+				var optionMatchProcessNames = new Option<bool>(new[] { "--matchprocess", "-mp" }, "Match process names");
+
+				this.AddOption(optionName);
+				this.AddOption(optionRegex);
+				this.AddOption(optionMatchProcessNames);
+
+				this.SetHandler(Execute, optionName, optionRegex, optionMatchProcessNames);
+
+			}
+
+			private void Execute(string? name, string? regex, bool matchProcessNames)
+			{
+				if(string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(regex))
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Name and regex query cannot be empty.");
+					Console.ResetColor();
+					return;
+				}
+
+				var data = GetDataFromDataPath();
+				var rule = new GroupingRule() { Name = name, RegexQuery = regex, ShowOnDashboard = true };
+
+				// Display entries to be squashed
+				var toSquash = data.Where(d => Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				if (toSquash.Count == 0)
+				{
+					Console.WriteLine("No entries to squash.");
+					return;
+				}
+
+				Console.WriteLine("Entries to squash:");
+				Table t = Table.FromDataSet(toSquash, d =>
+				{
+					var name = d.WindowTitle.Length > 50 ? d.WindowTitle.Substring(0, 50) : d.WindowTitle;
+					var totaltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+					var timetoday = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+					var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+					return new Row(name, totaltime, timetoday, timeweek);
+				});
+				t.SetHeader(new("Name", "Total Time", "Today", "Week"));
+				t.Print();
+
+				var squash = SquashDataUsingRule(data, rule, matchProcessNames);
+				var result = squash.FirstOrDefault(d => d.WindowTitle == name);
+				if (result != null)
+				{
+					Console.WriteLine();
+					Console.WriteLine("Squashed entry:");
+					Table t2 = Table.FromDataSet(new[] { result }, d =>
+					{
+						var name = d.WindowTitle.Length > 50 ? d.WindowTitle.Substring(0, 50) : d.WindowTitle;
+						var totaltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+						var timetoday = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+						var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+						return new Row(name, totaltime, timetoday, timeweek);
+					});
+					t2.SetHeader(new("Name", "Total Time", "Today", "Week"));
+					t2.Print();
+				}
+				else
+				{
+					Console.WriteLine("Failed to squash entries.");
+				}
+
+				Console.WriteLine("This action is irreversible. Do you want to save the changes?");
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.Write("(y/n): ");
+				Console.ResetColor();
+				if (Console.ReadLine()?.ToLower() == "y")
+				{
+					SaveDataToDataPath(squash.ToList());
+					Console.WriteLine("Saved changes.");
+				}
+				else
+				{
+					Console.WriteLine("Changes not saved.");
 				}
 			}
 		}

@@ -37,11 +37,9 @@ namespace DotSights.Tracker
 				trackedData.Add(activity.WindowTitle, activity);
 			}
 
-
 			while (!stoppingToken.IsCancellationRequested)
 			{
-
-
+				long start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 				string currentWindow = Core.DotSights.GetFocusedWindow();
 				string searchKey = currentWindow;
 				var processName = Core.DotSights.GetFocusedProcessName().ToLower();
@@ -77,9 +75,10 @@ namespace DotSights.Tracker
 					SaveData(null);
 					ciclesSinceSave = 0;
 				}
-
 				ciclesSinceSave++;
-				await Task.Delay(1000, stoppingToken);
+				long end = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+				long delay = 1000 - (end - start);
+				await Task.Delay((int) delay, stoppingToken);
 			}
 		}
 		private void SaveData(object? state)

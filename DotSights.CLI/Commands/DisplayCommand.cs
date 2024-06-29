@@ -58,13 +58,15 @@ namespace DotSights.CLI.Commands
 				else if (orderTime)
 					data = data.OrderByDescending(d => d.TotalTimeToday).ToList();
 
-				List<object[]> dataSet =
-				[
-					["Process Name", "Title", "Usage Time"],
-					.. data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort(d.TotalTimeToday) }),
-				];
+				Table t = Table.FromDataSet(data, d =>
+				{
+					var processName = d.ProcessName ?? string.Empty;
+					var title = d.WindowTitle;
+					var time = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+					return new Row(processName, title, time);
+				});
 
-				Table t = Table.FromDataSet(dataSet);
+				t.SetHeader(new("Process name", "Title", "Usage time"));
 
 				t.UsePreset(template);
 
@@ -97,14 +99,16 @@ namespace DotSights.CLI.Commands
 				else if (orderTime)
 					data = data.OrderByDescending(d => d.FocusedTimeInSeconds).ToList();
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "Usage Time" }
-		};
+				Table t = Table.FromDataSet(data, d =>
+				{
+					var processName = d.ProcessName ?? string.Empty;
+					var title = d.WindowTitle;
+					var alltime = DotFormatting.FormatTimeShort((int) d.FocusedTimeInSeconds);
+					return new Row(processName, title, alltime);
+				});
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds) }));
+				t.SetHeader(new("Process Name", "Title", "Total usage"));
 
-				Table t = Table.FromDataSet(dataSet);
 
 				t.UsePreset(template);
 
@@ -138,14 +142,15 @@ namespace DotSights.CLI.Commands
 				else if (orderTime)
 					data = data.OrderByDescending(d => d.GetUsageTimeForWeek()).ToList();
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "Usage Time" }
-		};
+				Table t = Table.FromDataSet(data, d =>
+				{
+					var processName = d.ProcessName ?? string.Empty;
+					var title = d.WindowTitle;
+					var time = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+					return new Row(processName, title, time);
+				});
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek()) }));
-
-				Table t = Table.FromDataSet(dataSet);
+				t.SetHeader(new("Process name", "Title", "Usage time"));
 
 				t.UsePreset(template);
 
@@ -179,14 +184,17 @@ namespace DotSights.CLI.Commands
 				else if (orderTime)
 					data = data.OrderByDescending(d => d.TotalTimeToday).ToList();
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "All-Time Usage Time", "Today's Usage ", "This week's Usage" }
-		};
+				Table t = Table.FromDataSet(data, d =>
+				{
+					var processName = d.ProcessName ?? string.Empty;
+					var title = d.WindowTitle;
+					var alltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+					var todaytime = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+					var weektime = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+					return new Row(processName, title, alltime, todaytime, weektime);
+				});
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, d.FormattedTotalUsageTime, DotFormatting.FormatTimeShort(d.TotalTimeToday), DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek()) }));
-
-				Table t = Table.FromDataSet(dataSet);
+				t.SetHeader(new("Process Name", "Title", "Total usage", "Today's usage", "Past 7 days' usage"));
 
 				t.UsePreset(template);
 

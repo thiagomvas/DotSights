@@ -40,6 +40,8 @@ namespace DotSights.Tracker
 
 			while (!stoppingToken.IsCancellationRequested)
 			{
+
+
 				string currentWindow = Core.DotSights.GetFocusedWindow();
 				string searchKey = currentWindow;
 				var processName = Core.DotSights.GetFocusedProcessName().ToLower();
@@ -63,6 +65,15 @@ namespace DotSights.Tracker
 
 				if (ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
 				{
+					data = Core.DotSights.GetDataFromDataPath();
+					settings = Core.DotSights.LoadSettings();
+					trackedData.Clear();
+
+					foreach (var activity in data!)
+					{
+						trackedData.Add(activity.WindowTitle, activity);
+					}
+
 					SaveData(null);
 					ciclesSinceSave = 0;
 				}

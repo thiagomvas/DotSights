@@ -22,6 +22,11 @@ To get the tracker, head to the [Releases](https://github.com/thiagomvas/DotSigh
 
 For accurate tracking, it should run on start up. To do this, open your start up folder and add either the exe itself, or a shortcut to it. Make sure the exe is somewhere that won't be deleted.
 
+## CLI
+To install the dashboard, you need the .NET SDK
+
+After it is installed, run ``dotnet tool install --global DotSights.CLI`` to install the tool globally. Use ``DotSights -h`` on the terminal for more help.
+
 ### Dashboard
 **TO RUN THE DASHBOARD, YOU NEED .NET 8 INSTALLED**
 

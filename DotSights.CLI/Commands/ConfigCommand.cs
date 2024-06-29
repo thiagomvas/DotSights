@@ -355,7 +355,7 @@ namespace DotSights.CLI.Commands
 
 			private void Execute(string? name, string? regex, bool matchProcessNames)
 			{
-				if(string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(regex))
+				if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(regex))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Name and regex query cannot be empty.");
@@ -367,7 +367,17 @@ namespace DotSights.CLI.Commands
 				var rule = new GroupingRule() { Name = name, RegexQuery = regex, ShowOnDashboard = true };
 
 				// Display entries to be squashed
-				var toSquash = data.Where(d => Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				List<ActivityData> toSquash;
+
+				if (matchProcessNames)
+				{
+					toSquash = data.Where(d => Regex.IsMatch(d.ProcessName, regex) || Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				}
+				else
+				{
+					toSquash = data.Where(d => Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				}
+
 				if (toSquash.Count == 0)
 				{
 					Console.WriteLine("No entries to squash.");

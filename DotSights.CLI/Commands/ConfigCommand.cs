@@ -12,7 +12,7 @@ namespace DotSights.CLI.Commands
 {
 	internal class ConfigCommand : BaseCommand
 	{
-		public ConfigCommand() : base("config", "Configuration-Related commands and options for DotSights. Some settings can only be changed by editing the config file directly.")
+		public ConfigCommand() : base("config", "Configuration-Related commands and options for DotSights. Some settings can only be changed by editing the config file directly. Configuration changes only apply after data save or restarting tracker.")
 		{
 		}
 
@@ -362,6 +362,16 @@ namespace DotSights.CLI.Commands
 					Console.ResetColor();
 					return;
 				}
+
+				// See if tracker is running
+				var processes = Process.GetProcessesByName("DotSights.Tracker");
+				if (processes.Length > 0)
+				{
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Tracker is running. Please stop the tracker before squashing data.");
+                    Console.ResetColor();
+                    return;
+                }
 
 				var data = GetDataFromDataPath();
 				var rule = new GroupingRule() { Name = name, RegexQuery = regex, ShowOnDashboard = true };

@@ -99,6 +99,19 @@ public static class DotSights
 		return new List<ActivityData>();
 	}
 
+	public static async Task<List<ActivityData>> GetDataFromDataPathAsync()
+	{
+        if (File.Exists(DataFilePath))
+		{
+            string data = await File.ReadAllTextAsync(DataFilePath);
+            if (DeserializeData(data, out List<ActivityData>? result))
+			{
+                return result ?? new List<ActivityData>();
+            }
+        }
+        return new List<ActivityData>();
+    }
+
 	public static void SaveDataToDataPath(List<ActivityData> data)
 	{
 		File.WriteAllText(DataFilePath, SerializeData(data));

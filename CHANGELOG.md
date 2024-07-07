@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.2.0"></a>
+## [1.2.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.2.0) (2024-07-07)
+
+### Features
+
+* Add pagination and interactable tables ([7d372cc](https://www.github.com/thiagomvas/DotSights/commit/7d372cc6b051edeb3cceaf1e1214d9816d3c2e0a))
+
+### Bug Fixes
+
+* Weekly Data only shows past 7 real days instead of past 7 days of usage ([2c15037](https://www.github.com/thiagomvas/DotSights/commit/2c15037408fc8755d3f2a011b6c588d860c5b5a5))
+* **tracker:** Tracker now reads data from file before saving, preventing overrides ([4f2136c](https://www.github.com/thiagomvas/DotSights/commit/4f2136c1003ce580de9cf7dc3c7fabcaed763920))
+
 <a name="1.1.0"></a>
 ## [1.1.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.1.0) (2024-06-29)
 

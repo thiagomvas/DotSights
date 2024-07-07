@@ -200,7 +200,7 @@ namespace DotSights.CLI.Commands
 					return new Row(p.Name, p.GetValue(settings)?.ToString() ?? string.Empty);
 				});
 
-				t.EmptyReplacement = "N/A";
+				t.UseNullOrEmptyReplacement("N/A");
 				t.SetHeader(new("Name", "Value"));
 				t.Header.Cells.ForEach(c => c.Alignment = Alignment.Center);
 
@@ -231,7 +231,7 @@ namespace DotSights.CLI.Commands
 					return new Row(r.Name, r.RegexQuery, r.ShowOnDashboard);
 				});
 
-				groupingTable.EmptyReplacement = "N/A";
+				groupingTable.UseNullOrEmptyReplacement("N/A");
 				groupingTable.SetHeader(new("Name", "Regex Query", "Display"));
 				groupingTable.UsePreset(c =>
 				{

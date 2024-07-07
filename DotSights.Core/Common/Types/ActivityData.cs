@@ -296,6 +296,7 @@ namespace DotSights.Core.Common.Types
 
 		public int GetUsageTimeForWeek()
 		{
+			EnsureLast7DaysData();
 			return Last7DaysUsage.Values.Sum();
 		}
 	}

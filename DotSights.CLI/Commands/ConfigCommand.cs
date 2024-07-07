@@ -1,16 +1,18 @@
 ﻿using DotSights.Core.Common.Types;
+using DotSights.Core.Common.Utils;
 using SharpTables;
 using System.Collections;
 using System.CommandLine;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using static DotSights.Core.DotSights;
 
 namespace DotSights.CLI.Commands
 {
 	internal class ConfigCommand : BaseCommand
 	{
-		public ConfigCommand() : base("config", "Configuration-Related commands and options for DotSights. Some settings can only be changed by editing the config file directly.")
+		public ConfigCommand() : base("config", "Configuration-Related commands and options for DotSights. Some settings can only be changed by editing the config file directly. Configuration changes only apply after data save or restarting tracker.")
 		{
 		}
 
@@ -22,6 +24,7 @@ namespace DotSights.CLI.Commands
 			AddCommand(new PreviewCommand());
 			AddCommand(new RegexCommand());
 			AddCommand(new OpenCommand());
+			AddCommand(new SquashCommand());
 
 			var groupItemsWithSameProcessName = new Option<bool?>(new[] { "--groupprocesses", "-gp" }, "Group items with the same process name");
 			var groupItemsUsingGroupingRules = new Option<bool?>(new[] { "--userules", "-u" }, "Group items using grouping rules");
@@ -197,7 +200,7 @@ namespace DotSights.CLI.Commands
 					return new Row(p.Name, p.GetValue(settings)?.ToString() ?? string.Empty);
 				});
 
-				t.EmptyReplacement = "N/A";
+				t.UseNullOrEmptyReplacement("N/A");
 				t.SetHeader(new("Name", "Value"));
 				t.Header.Cells.ForEach(c => c.Alignment = Alignment.Center);
 
@@ -228,7 +231,7 @@ namespace DotSights.CLI.Commands
 					return new Row(r.Name, r.RegexQuery, r.ShowOnDashboard);
 				});
 
-				groupingTable.EmptyReplacement = "N/A";
+				groupingTable.UseNullOrEmptyReplacement("N/A");
 				groupingTable.SetHeader(new("Name", "Regex Query", "Display"));
 				groupingTable.UsePreset(c =>
 				{
@@ -330,6 +333,113 @@ namespace DotSights.CLI.Commands
 				catch
 				{
 					Console.WriteLine("Failed to open configuration file.");
+				}
+			}
+		}
+
+		private class SquashCommand : Command
+		{
+			public SquashCommand() : base("squash", "Squash data using grouping rules")
+			{
+				var optionName = new Option<string?>(new[] { "--name", "-n" }, "Name of the rule");
+				var optionRegex = new Option<string?>(new[] { "--regex", "-r" }, "Regex query to match");
+				var optionMatchProcessNames = new Option<bool>(new[] { "--matchprocess", "-mp" }, "Match process names");
+
+				this.AddOption(optionName);
+				this.AddOption(optionRegex);
+				this.AddOption(optionMatchProcessNames);
+
+				this.SetHandler(Execute, optionName, optionRegex, optionMatchProcessNames);
+
+			}
+
+			private void Execute(string? name, string? regex, bool matchProcessNames)
+			{
+				if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(regex))
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Name and regex query cannot be empty.");
+					Console.ResetColor();
+					return;
+				}
+
+				// See if tracker is running
+				var processes = Process.GetProcessesByName("DotSights.Tracker");
+				if (processes.Length > 0)
+				{
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Tracker is running. Please stop the tracker before squashing data.");
+                    Console.ResetColor();
+                    return;
+                }
+
+				var data = GetDataFromDataPath();
+				var rule = new GroupingRule() { Name = name, RegexQuery = regex, ShowOnDashboard = true };
+
+				// Display entries to be squashed
+				List<ActivityData> toSquash;
+
+				if (matchProcessNames)
+				{
+					toSquash = data.Where(d => Regex.IsMatch(d.ProcessName, regex) || Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				}
+				else
+				{
+					toSquash = data.Where(d => Regex.IsMatch(d.WindowTitle, regex)).ToList();
+				}
+
+				if (toSquash.Count == 0)
+				{
+					Console.WriteLine("No entries to squash.");
+					return;
+				}
+
+				Console.WriteLine("Entries to squash:");
+				Table t = Table.FromDataSet(toSquash, d =>
+				{
+					var name = d.WindowTitle.Length > 50 ? d.WindowTitle.Substring(0, 50) : d.WindowTitle;
+					var totaltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+					var timetoday = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+					var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+					return new Row(name, totaltime, timetoday, timeweek);
+				});
+				t.SetHeader(new("Name", "Total Time", "Today", "Week"));
+				t.Print();
+
+				var squash = SquashDataUsingRule(data, rule, matchProcessNames);
+				var result = squash.FirstOrDefault(d => d.WindowTitle == name);
+				if (result != null)
+				{
+					Console.WriteLine();
+					Console.WriteLine("Squashed entry:");
+					Table t2 = Table.FromDataSet(new[] { result }, d =>
+					{
+						var name = d.WindowTitle.Length > 50 ? d.WindowTitle.Substring(0, 50) : d.WindowTitle;
+						var totaltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+						var timetoday = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+						var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+						return new Row(name, totaltime, timetoday, timeweek);
+					});
+					t2.SetHeader(new("Name", "Total Time", "Today", "Week"));
+					t2.Print();
+				}
+				else
+				{
+					Console.WriteLine("Failed to squash entries.");
+				}
+
+				Console.WriteLine("This action is irreversible. Do you want to save the changes?");
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.Write("(y/n): ");
+				Console.ResetColor();
+				if (Console.ReadLine()?.ToLower() == "y")
+				{
+					SaveDataToDataPath(squash.ToList());
+					Console.WriteLine("Saved changes.");
+				}
+				else
+				{
+					Console.WriteLine("Changes not saved.");
 				}
 			}
 		}

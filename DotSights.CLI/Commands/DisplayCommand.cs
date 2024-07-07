@@ -1,197 +1,208 @@
-﻿using DotSights.Core.Common.Utils;
+﻿using DotSights.Core.Common.Types;
+using DotSights.Core.Common.Utils;
 using SharpTables;
 using System.CommandLine;
 using static DotSights.Core.DotSights;
 
 namespace DotSights.CLI.Commands
 {
-	internal class DisplayCommand : BaseCommand
-	{
-		public static readonly Action<Cell> template = c =>
-		{
-			if (c.Position.X == 0)
-				c.Color = ConsoleColor.Yellow;
-			else
-			{
-				if (c.Text.Length > 50)
-					c.Text = c.Text.Substring(0, 50) + "...";
-			}
-		};
-		public DisplayCommand() : base("display", "Displays data tracked by DotSights directly on the terminal")
-		{
-		}
+    internal class DisplayCommand : BaseCommand
+    {
+        public static readonly Action<Cell> template = c =>
+        {
+            if (c.Text.Length > 25)
+                c.Text = c.Text.Substring(0, 25) + "...";
 
-		public override void Setup(RootCommand root)
-		{
-			AddCommand(new TodayCommand());
-			AddCommand(new AllTimeCommand());
-			AddCommand(new WeekCommand());
-			AddCommand(new AllCommand());
+            if(c.Position.X == 0)
+                c.Color = ConsoleColor.Gray;
 
-			root.Add(this);
-		}
+            if(c.Position.X == 2)
+                c.Color = ConsoleColor.Yellow;
+        };
+        public DisplayCommand() : base("display", "Displays data tracked by DotSights directly on the terminal")
+        {
+        }
 
-		private class TodayCommand : Command
-		{
-			public TodayCommand() : base("today", "Display the total usage data tracked for today")
-			{
-				var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
-				var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
-				var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
+        public override void Setup(RootCommand root)
+        {
+            AddCommand(new TodayCommand());
+            AddCommand(new AllTimeCommand());
+            AddCommand(new WeekCommand());
+            AddCommand(new AllCommand());
 
-				this.AddOption(optionShowAll);
-				this.AddOption(optionOrderAlphabetical);
-				this.AddOption(optionOrderTime);
+            root.Add(this);
+        }
 
-				this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
-			}
+        public static List<ActivityData> SetupData(bool showAll, bool orderAlphabetical, bool orderTime)
+        {
+            var data = GetDataFromDataPath();
 
-			private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
-			{
-				var data = GetDataFromDataPath();
+            if (!showAll)
+                data = FilterDataFromSettings(GetDataFromDataPath(), LoadSettings());
 
-				if (!showAll)
-					data = FilterDataFromSettings(GetDataFromDataPath(), LoadSettings());
+            if (orderAlphabetical)
+                data = data.OrderBy(d => d.WindowTitle).ToList();
 
-				if (orderAlphabetical)
-					data = data.OrderBy(d => d.WindowTitle).ToList();
-				else if (orderTime)
-					data = data.OrderByDescending(d => d.TotalTimeToday).ToList();
+            return data;
+        }
 
-				List<object[]> dataSet =
-				[
-					["Process Name", "Title", "Usage Time"],
-					.. data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort(d.TotalTimeToday) }),
-				];
+        public static void ApplyTableTemplate(Table t)
+        {
+            t.UsePreset(template)
+                .UseNullOrEmptyReplacement("N/A");
+        }
 
-				Table t = Table.FromDataSet(dataSet);
+        private class TodayCommand : Command
+        {
+            public TodayCommand() : base("today", "Display the total usage data tracked for today")
+            {
+                var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
+                var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
+                var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
 
-				t.UsePreset(template);
+                this.AddOption(optionShowAll);
+                this.AddOption(optionOrderAlphabetical);
+                this.AddOption(optionOrderTime);
 
-				t.Print();
-			}
-		}
-		private class AllTimeCommand : Command
-		{
-			public AllTimeCommand() : base("alltime", "Display the total usage data tracked")
-			{
-				var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
-				var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
-				var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
+                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
+            }
 
-				this.AddOption(optionShowAll);
-				this.AddOption(optionOrderAlphabetical);
-				this.AddOption(optionOrderTime);
+            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
+            {
+                var data = SetupData(showAll, orderAlphabetical, orderTime);
+                data = data.Where(d => d.TotalTimeToday > 0).ToList();
+                if (orderTime)
+                    data = data.OrderByDescending(d => d.TotalTimeToday).ToList();
 
-				this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
-			}
+                Table t = Table.FromDataSet(data, d =>
+                {
+                    var processName = d.ProcessName ?? string.Empty;
+                    var title = d.WindowTitle;
+                    var time = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+                    return new Row(processName, title, time);
+                });
 
-			private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
-			{
-				var data = GetDataFromDataPath();
-				if (!showAll)
-					data = FilterDataFromSettings(data, LoadSettings());
+                t.SetHeader(new("Process name", "Title", "Usage time"));
 
-				if (orderAlphabetical)
-					data = data.OrderBy(d => d.WindowTitle).ToList();
-				else if (orderTime)
-					data = data.OrderByDescending(d => d.FocusedTimeInSeconds).ToList();
+                ApplyTableTemplate(t);
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "Usage Time" }
-		};
+                Utils.EnterInteractableMode(t);
+            }
+        }
+        private class AllTimeCommand : Command
+        {
+            public AllTimeCommand() : base("alltime", "Display the total usage data tracked")
+            {
+                var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
+                var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
+                var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds) }));
+                this.AddOption(optionShowAll);
+                this.AddOption(optionOrderAlphabetical);
+                this.AddOption(optionOrderTime);
 
-				Table t = Table.FromDataSet(dataSet);
+                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
+            }
 
-				t.UsePreset(template);
+            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
+            {
+                var data = SetupData(showAll, orderAlphabetical, orderTime);
 
-				t.Print();
-			}
-		}
+                if (orderTime)
+                    data = data.OrderByDescending(d => d.FocusedTimeInSeconds).ToList();
 
-		private class WeekCommand : Command
-		{
-			public WeekCommand() : base("week", "Display the total usage data tracked for the last 7 days")
-			{
-				var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
-				var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
-				var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
+                Table t = Table.FromDataSet(data, d =>
+                {
+                    var processName = d.ProcessName ?? string.Empty;
+                    var title = d.WindowTitle;
+                    var alltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+                    return new Row(processName, title, alltime);
+                });
 
-				this.AddOption(optionShowAll);
-				this.AddOption(optionOrderAlphabetical);
-				this.AddOption(optionOrderTime);
+                t.SetHeader(new("Process Name", "Title", "Total usage"));
 
-				this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
-			}
 
-			private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
-			{
-				var data = GetDataFromDataPath();
-				if (!showAll)
-					data = FilterDataFromSettings(data, LoadSettings());
+                ApplyTableTemplate(t);
 
-				if (orderAlphabetical)
-					data = data.OrderBy(d => d.WindowTitle).ToList();
-				else if (orderTime)
-					data = data.OrderByDescending(d => d.GetUsageTimeForWeek()).ToList();
+                Utils.EnterInteractableMode(t);
+            }
+        }
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "Usage Time" }
-		};
+        private class WeekCommand : Command
+        {
+            public WeekCommand() : base("week", "Display the total usage data tracked for the last 7 days")
+            {
+                var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
+                var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
+                var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek()) }));
+                this.AddOption(optionShowAll);
+                this.AddOption(optionOrderAlphabetical);
+                this.AddOption(optionOrderTime);
 
-				Table t = Table.FromDataSet(dataSet);
+                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
+            }
 
-				t.UsePreset(template);
+            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
+            {
+                var data = SetupData(showAll, orderAlphabetical, orderTime);
+                data = data.Where(d => d.GetUsageTimeForWeek() > 0).ToList();
+                if (orderTime)
+                    data = data.OrderByDescending(d => d.GetUsageTimeForWeek()).ToList();
 
-				t.Print();
-			}
-		}
+                Table t = Table.FromDataSet(data, d =>
+                {
+                    var processName = d.ProcessName ?? string.Empty;
+                    var title = d.WindowTitle;
+                    var time = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+                    return new Row(processName, title, time);
+                });
 
-		private class AllCommand : Command
-		{
-			public AllCommand() : base("all", "Display the total usage data tracked since the beginning, usage for today and usage for the last 7 days")
-			{
-				var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
-				var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
-				var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
+                t.SetHeader(new("Process name", "Title", "Usage time"));
 
-				this.AddOption(optionShowAll);
-				this.AddOption(optionOrderAlphabetical);
-				this.AddOption(optionOrderTime);
+                ApplyTableTemplate(t);
 
-				this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
-			}
+                Utils.EnterInteractableMode(t);
+            }
+        }
 
-			private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
-			{
-				var data = GetDataFromDataPath();
-				if (!showAll)
-					data = FilterDataFromSettings(data, LoadSettings());
+        private class AllCommand : Command
+        {
+            public AllCommand() : base("all", "Display the total usage data tracked since the beginning, usage for today and usage for the last 7 days")
+            {
+                var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
+                var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
+                var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
 
-				if (orderAlphabetical)
-					data = data.OrderBy(d => d.WindowTitle).ToList();
-				else if (orderTime)
-					data = data.OrderByDescending(d => d.TotalTimeToday).ToList();
+                this.AddOption(optionShowAll);
+                this.AddOption(optionOrderAlphabetical);
+                this.AddOption(optionOrderTime);
 
-				List<object[]> dataSet = new List<object[]>
-		{
-			new object[] { "Process Name", "Title", "All-Time Usage Time", "Today's Usage ", "This week's Usage" }
-		};
+                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
+            }
 
-				dataSet.AddRange(data.Select(d => new object[] { d.ProcessName ?? string.Empty, d.WindowTitle, d.FormattedTotalUsageTime, DotFormatting.FormatTimeShort(d.TotalTimeToday), DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek()) }));
+            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
+            {
+                var data = SetupData(showAll, orderAlphabetical, orderTime);
+                if (orderTime)
+                    data = data.OrderByDescending(d => d.FocusedTimeInSeconds).ToList();
 
-				Table t = Table.FromDataSet(dataSet);
+                Table t = Table.FromDataSet(data, d =>
+                {
+                    var processName = d.ProcessName ?? string.Empty;
+                    var title = d.WindowTitle;
+                    var alltime = DotFormatting.FormatTimeShort((int)d.FocusedTimeInSeconds);
+                    var todaytime = DotFormatting.FormatTimeShort(d.TotalTimeToday);
+                    var weektime = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
+                    return new Row(processName, title, alltime, todaytime, weektime);
+                });
 
-				t.UsePreset(template);
+                t.SetHeader(new("Process Name", "Title", "Total usage", "Today's usage", "Past 7 days' usage"));
 
-				t.Print();
-			}
-		}
-	}
+                ApplyTableTemplate(t);
+
+                Utils.EnterInteractableMode(t);
+            }
+        }
+    }
 }

@@ -1,93 +1,137 @@
 using DotSights.Core.Common.Types;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DotSights.Tracker
 {
-	public class Worker : BackgroundService
-	{
-		private DotSightsSettings settings = new();
-		private readonly ILogger<Worker> _logger;
-		private static DateTime startTime;
-		private Dictionary<string, ActivityData> trackedData = new();
+    public class Worker : BackgroundService
+    {
+        private DotSightsSettings settings = new();
+        private readonly ILogger<Worker> _logger;
+        private static DateTime startTime;
+        private Dictionary<string, ActivityData> trackedData = new();
 
-		int ciclesSinceSave = 0; // 1 cycle = 1 second
-		public Worker(ILogger<Worker> logger)
-		{
-			_logger = logger;
-			settings = Core.DotSights.LoadSettings();
-			settings.TrackerExeLocation = Process.GetCurrentProcess().MainModule.FileName;
-			Core.DotSights.SaveSettings(settings);
-			// Create %AppData%\DotSights folder if it doesn't exist and save data file to that folder
-		}
+        int ciclesSinceSave = 0; // 1 cycle = 1 second
+        public Worker(ILogger<Worker> logger)
+        {
+            _logger = logger;
+            settings = Core.DotSights.LoadSettings();
+            settings.TrackerExeLocation = Process.GetCurrentProcess().MainModule.FileName;
+            Core.DotSights.SaveSettings(settings);
+            // Create %AppData%\DotSights folder if it doesn't exist and save data file to that folder
+        }
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-		{
-			startTime = DateTime.Now;
-			Core.DotSights.AssureSetup();
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            try
+            {
+                var lastSaveTime = DateTime.Now;
+                Core.DotSights.AssureSetup();
 
-			var data = Core.DotSights.GetDataFromDataPath();
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    long start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    string currentWindow = Core.DotSights.GetFocusedWindow();
+                    string searchKey = currentWindow;
+                    var processName = Core.DotSights.GetFocusedProcessName().ToLower();
+                    if (settings.OptimizeForStorageSpace && settings.GroupedProcessNames.Any(p => string.Equals(p, processName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var match = trackedData.Values.Where(x => x.ProcessName.ToLower() == processName.ToLower()).FirstOrDefault();
+                        if (match != null)
+                        {
+                            searchKey = match.ProcessName;
+                        }
+                    }
 
-			if (data == null)
-			{
-				data = new List<ActivityData>();
-			}
+                    if (trackedData.ContainsKey(searchKey))
+                    {
+                        trackedData[searchKey]++;
+                    }
+                    else
+                    {
+                        RegisterNewActivity(searchKey);
+                    }
 
-			foreach (var activity in data!)
-			{
-				trackedData.Add(activity.WindowTitle, activity);
-			}
+                    if (DateTime.Now - lastSaveTime >= settings.TrackerSaveInterval)
+                    {
+                        settings = Core.DotSights.LoadSettings();
+
+                        await SaveData();
+                        lastSaveTime = DateTime.Now;
+                    }
+
+                    long end = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    int delay = (int)Math.Max(1, 1000 - (end - start));
+                    Thread.Sleep(delay);
+                }
+            }
+            finally
+            {
+                await SaveData();
+            }
+        }
+        private async Task SaveData()
+        {
+            Dictionary<string, ActivityData> data = new();
+            var loadeddata = Core.DotSights.GetDataFromDataPath();
+
+            if (loadeddata != null)
+            {
+                foreach (var activity in loadeddata)
+                {
+                    data.Add(activity.WindowTitle, activity);
+                }
+            }
 
 
-			while (!stoppingToken.IsCancellationRequested)
-			{
-				string currentWindow = Core.DotSights.GetFocusedWindow();
-				string searchKey = currentWindow;
-				var processName = Core.DotSights.GetFocusedProcessName().ToLower();
-				if (settings.OptimizeForStorageSpace && settings.GroupedProcessNames.Contains(processName))
-				{
-					var match = trackedData.Values.Where(x => x.ProcessName.ToLower() == processName.ToLower()).FirstOrDefault();
-					if (match != null)
-					{
-						searchKey = match.WindowTitle;
-					}
-				}
+            // Iterate over tracked data, and increment the total time for each activity
+            foreach (var (key, activity) in trackedData)
+            {
+                if (settings.OptimizeForStorageSpace && settings.GroupedProcessNames.Any(p => string.Equals(p, activity.ProcessName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var match = data.Values.Where(x => x.ProcessName.ToLower() == activity.ProcessName.ToLower()).FirstOrDefault();
+                    if (match != null)
+                    {
+                        data[match.WindowTitle] += activity;
+                    }
+                    else
+                    {
+                        data.Add(key, activity);
+                    }
+                }
+                else
+                {
+                    if (data.ContainsKey(key))
+                    {
+                        data[key] += activity;
+                    }
+                    else
+                    {
+                        data.Add(key, activity);
+                    }
+                }
 
-				if (trackedData.ContainsKey(searchKey))
-				{
-					trackedData[searchKey]++;
-				}
-				else
-				{
-					RegisterNewActivity(searchKey);
-				}
+            }
 
-				if (ciclesSinceSave >= settings.TrackerSaveInterval.TotalSeconds)
-				{
-					SaveData(null);
-					ciclesSinceSave = 0;
-				}
 
-				ciclesSinceSave++;
-				await Task.Delay(1000, stoppingToken);
-			}
-		}
-		private void SaveData(object? state)
-		{
-			var json = Core.DotSights.SerializeData(trackedData.Values.ToList());
-			File.WriteAllText(Core.DotSights.DataFilePath, json);
-		}
-		public override Task StopAsync(CancellationToken cancellationToken)
-		{
-			SaveData(null);
-			return base.StopAsync(cancellationToken);
-		}
 
-		private void RegisterNewActivity(string windowTitle)
-		{
-			var activity = new ActivityData(windowTitle);
-			activity.ProcessName = Core.DotSights.GetFocusedProcessName();
-			activity++;
-			trackedData.Add(windowTitle, activity);
-		}
-	}
+            var json = Core.DotSights.SerializeData(data.Values.ToList());
+            await File.WriteAllTextAsync(Core.DotSights.DataFilePath, json);
+            trackedData.Clear();
+        }
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            SaveData();
+            return base.StopAsync(cancellationToken);
+        }
+
+        private void RegisterNewActivity(string windowTitle)
+        {
+            var activity = new ActivityData(windowTitle);
+            activity.ProcessName = Core.DotSights.GetFocusedProcessName();
+            activity++;
+            trackedData.Add(windowTitle, activity);
+        }
+    }
 }

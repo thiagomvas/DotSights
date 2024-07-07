@@ -99,6 +99,19 @@ public static class DotSights
 		return new List<ActivityData>();
 	}
 
+	public static async Task<List<ActivityData>> GetDataFromDataPathAsync()
+	{
+        if (File.Exists(DataFilePath))
+		{
+            string data = await File.ReadAllTextAsync(DataFilePath);
+            if (DeserializeData(data, out List<ActivityData>? result))
+			{
+                return result ?? new List<ActivityData>();
+            }
+        }
+        return new List<ActivityData>();
+    }
+
 	public static void SaveDataToDataPath(List<ActivityData> data)
 	{
 		File.WriteAllText(DataFilePath, SerializeData(data));
@@ -168,7 +181,7 @@ public static class DotSights
 
 		foreach (var rule in settings.GroupingRules)
 		{
-			Regex regex = new(rule.RegexQuery, RegexOptions.IgnoreCase);
+			Regex regex = new(rule.RegexQuery, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
 			ActivityData? match = null;
 			foreach (var item in data)
 			{
@@ -363,6 +376,45 @@ public static class DotSights
 		}
 
 		plot1.SavePng("ActiveHours.png", 1080, 540);
+	}
+
+	/// <summary>
+	/// Merges data that matches a rule into a single item
+	/// </summary>
+	/// <param name="data">The data</param>
+	/// <param name="rule">The rule used to squash</param>
+	/// <param name="useProcessName">Whether to match processes names as well</param>
+	/// <returns>The data list with all matching entries merged together</returns>
+	public static List<ActivityData> SquashDataUsingRule(List<ActivityData> data, GroupingRule rule, bool useProcessName)
+	{
+		Regex regex = new(rule.RegexQuery, RegexOptions.IgnoreCase);
+		ActivityData? match = null;
+		List<ActivityData> matchedItems = new();
+
+		foreach (var item in data)
+		{
+			if (regex.IsMatch(item.WindowTitle))
+			{
+				if (match == null)
+					match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
+				match += item;
+
+				if (!matchedItems.Contains(item))
+					matchedItems.Add(item);
+			}
+			else if (useProcessName && regex.IsMatch(item.ProcessName ?? string.Empty))
+			{
+				if (match == null)
+					match = new() { WindowTitle = rule.Name, ProcessName = item.ProcessName, Alias = item.Alias };
+				match += item;
+
+				if (!matchedItems.Contains(item))
+					matchedItems.Add(item);
+			}
+		}
+
+		if (match is not null) return data.Except(matchedItems).Append(match).ToList();
+		else return data;
 	}
 }
 

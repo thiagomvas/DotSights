@@ -32,6 +32,8 @@ namespace DotSights.CLI.Commands
 			var regexMatchProcessName = new Option<bool?>(new[] { "--regexprocess", "-rp" }, "Regex Grouping Rules should match process names.");
 			var trackerSaveInterval = new Option<int?>(new[] { "--saveinterval", "-si" }, "Interval in minutes to save tracker data");
 			var optimizeForStorageSpace = new Option<bool?>(new[] { "--optimize", "-o" }, "Optimize for storage space");
+			var maxBackupFileCount = new Option<int?>(new[] { "--maxbackup", "-mb" }, "Maximum number of backup files to keep");
+			var backupInterval = new Option<int?>(new[] { "--backupinterval", "-bi" }, "Interval in days to backup data");
 
 			this.AddOption(groupItemsWithSameProcessName);
 			this.AddOption(groupItemsUsingGroupingRules);
@@ -39,15 +41,39 @@ namespace DotSights.CLI.Commands
 			this.AddOption(regexMatchProcessName);
 			this.AddOption(trackerSaveInterval);
 			this.AddOption(optimizeForStorageSpace);
+			this.AddOption(maxBackupFileCount);
+			this.AddOption(backupInterval);
 
-			this.SetHandler(Execute, groupItemsWithSameProcessName, groupItemsUsingGroupingRules, showOnlyRegexMatchedItems, regexMatchProcessName, trackerSaveInterval, optimizeForStorageSpace);
+			this.SetHandler(Execute,
+                   groupItemsWithSameProcessName,
+                   groupItemsUsingGroupingRules,
+                   showOnlyRegexMatchedItems,
+                   regexMatchProcessName,
+                   trackerSaveInterval,
+                   optimizeForStorageSpace,
+                   maxBackupFileCount,
+                   backupInterval);
 
 			root.Add(this);
 		}
 
-		private void Execute(bool? groupItemsWithSameProcessName, bool? groupItemsUsingGroupingRules, bool? showOnlyRegexMatchedItems, bool? regexMatchProcessName, int? trackerSaveInterval, bool? optimizeForStorageSpace)
+		private void Execute(bool? groupItemsWithSameProcessName,
+                       bool? groupItemsUsingGroupingRules,
+                       bool? showOnlyRegexMatchedItems,
+                       bool? regexMatchProcessName,
+                       int? trackerSaveInterval,
+                       bool? optimizeForStorageSpace,
+					   int? maxBackupFileCount,
+					   int? backupInterval)
 		{
-			if (groupItemsWithSameProcessName == null && groupItemsUsingGroupingRules == null && showOnlyRegexMatchedItems == null && regexMatchProcessName == null && trackerSaveInterval == null && optimizeForStorageSpace == null)
+			if (groupItemsWithSameProcessName == null
+                && groupItemsUsingGroupingRules == null
+                && showOnlyRegexMatchedItems == null
+                && regexMatchProcessName == null
+                && trackerSaveInterval == null
+                && optimizeForStorageSpace == null
+				&& maxBackupFileCount == null
+				&& backupInterval == null)
 			{
 				Console.WriteLine("No changes specified.");
 				return;
@@ -71,6 +97,11 @@ namespace DotSights.CLI.Commands
 			if (optimizeForStorageSpace != null)
 				settings.OptimizeForStorageSpace = optimizeForStorageSpace.Value;
 
+			if(maxBackupFileCount != null)
+                settings.MaxBackupFileCount = maxBackupFileCount.Value;
+
+			if (backupInterval != null)
+				settings.DataBackupInterval = TimeSpan.FromDays(backupInterval.Value);
 
 
 			SaveSettings(settings);

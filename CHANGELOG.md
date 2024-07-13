@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.3.0"></a>
+## [1.3.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.3.0) (2024-07-13)
+
+### Features
+
+* Add 'config backup' command to create a backup ([01b6167](https://www.github.com/thiagomvas/DotSights/commit/01b61671aa525602c0027909e7b6d2441b3356c7))
+* Add 'display overall' command ([19133c3](https://www.github.com/thiagomvas/DotSights/commit/19133c3af8aa15b13b7cd073b5f1b94a416eb36a))
+* Add automatic data backups ([132fdb8](https://www.github.com/thiagomvas/DotSights/commit/132fdb869525cfffb62741ba14f81c20b61be9e8))
+* Add config options for backup configuration ([db040f2](https://www.github.com/thiagomvas/DotSights/commit/db040f2803c1fa641d9e949920484ef60e975ac3))
+* Add config restore command to restore backup data ([c5f2480](https://www.github.com/thiagomvas/DotSights/commit/c5f2480e2f04d155ddcf9cfc01a3f2907f21a7b4))
+
 <a name="1.2.0"></a>
 ## [1.2.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.2.0) (2024-07-07)
 

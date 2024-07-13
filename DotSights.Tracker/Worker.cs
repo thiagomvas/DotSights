@@ -29,12 +29,6 @@ namespace DotSights.Tracker
                 var lastSaveTime = DateTime.Now;
                 Core.DotSights.AssureSetup();
 
-                // Check if backup is needed
-                if (DateTime.Now - Core.DotSights.GetLastBackupDate() >= settings.DataBackupInterval)
-                {
-                    Core.DotSights.CreateNewDataBackup();
-                    Core.DotSights.AssureBackupFileCount(settings.MaxBackupFileCount);
-                }
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -66,6 +60,13 @@ namespace DotSights.Tracker
 
                         await SaveData();
                         lastSaveTime = DateTime.Now;
+
+                        // Check if backup is needed
+                        if (DateTime.Now - Core.DotSights.GetLastBackupDate() >= settings.DataBackupInterval)
+                        {
+                            Core.DotSights.CreateNewDataBackup();
+                            Core.DotSights.AssureBackupFileCount(settings.MaxBackupFileCount);
+                        }
                     }
 
                     long end = DateTimeOffset.Now.ToUnixTimeMilliseconds();

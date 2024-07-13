@@ -11,7 +11,7 @@ namespace DotSights.CLI
             while (true)
             {
                 Console.Clear();
-                pages.PrintCurrentPage();
+                pages.PrintCurrent();
                 Console.WriteLine($"Page {pages.CurrentPageIndex + 1} of {pages.TotalPages}");
                 Console.WriteLine("[<-] Previous Page \n[->] Next Page \n[S] Write as plain text \n[H] Write as HTML \n[M] Write as Markdown \n[F] Print full table \n[ESC] Exit");
 
@@ -20,10 +20,10 @@ namespace DotSights.CLI
                 switch (key)
                 {
                     case ConsoleKey.LeftArrow:
-                        pages.PreviousPage(); // Prints the previous page and moves the page index back
+                        pages.PrintPrevious(); // Prints the previous page and moves the page index back
                         break;
                     case ConsoleKey.RightArrow:
-                        pages.NextPage(); // Prints the next page and moves the page index forward
+                        pages.PrintNext(); // Prints the next page and moves the page index forward
                         break;
                     case ConsoleKey.Escape:
                         return;
@@ -47,7 +47,7 @@ namespace DotSights.CLI
                         break;
                     case ConsoleKey.F:
                         Console.Clear();
-                        original.Print(); // Prints the original table, before pagination
+                        original.Write(); // Prints the original table, before pagination
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey();
                         break;

@@ -223,7 +223,7 @@ namespace DotSights.CLI.Commands
 				});
 
 				Console.WriteLine("General Settings");
-				t.Print();
+				t.Write();
 				Console.WriteLine();
 
 				Table groupingTable = Table.FromDataSet(settings.GroupingRules, r =>
@@ -243,7 +243,7 @@ namespace DotSights.CLI.Commands
 				});
 
 				Console.WriteLine("Grouping Rules");
-				groupingTable.Print();
+				groupingTable.Write();
 				Console.WriteLine();
 			}
 		}
@@ -404,7 +404,7 @@ namespace DotSights.CLI.Commands
 					return new Row(name, totaltime, timetoday, timeweek);
 				});
 				t.SetHeader(new("Name", "Total Time", "Today", "Week"));
-				t.Print();
+				t.Write();
 
 				var squash = SquashDataUsingRule(data, rule, matchProcessNames);
 				var result = squash.FirstOrDefault(d => d.WindowTitle == name);
@@ -421,7 +421,7 @@ namespace DotSights.CLI.Commands
 						return new Row(name, totaltime, timetoday, timeweek);
 					});
 					t2.SetHeader(new("Name", "Total Time", "Today", "Week"));
-					t2.Print();
+					t2.Write();
 				}
 				else
 				{

@@ -5,8 +5,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<InvariantGlobalization>true</InvariantGlobalization>
 		<PackAsTool>True</PackAsTool>
+		<InvariantGlobalization>true</InvariantGlobalization>
 		<ToolCommandName>DotSights</ToolCommandName>
 		<Version>1.2.0</Version>
 		<Description>Screen usage tracker with customizable options. See project repository for instructions.</Description>
@@ -42,7 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SharpTables" Version="1.2.1" />
+		<PackageReference Include="SharpTables" Version="1.3.0" />
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
 	</ItemGroup>
 

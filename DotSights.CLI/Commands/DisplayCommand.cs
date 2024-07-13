@@ -1,7 +1,10 @@
 ﻿using DotSights.Core.Common.Types;
 using DotSights.Core.Common.Utils;
 using SharpTables;
+using SharpTables.Graph;
+using System.Collections.Specialized;
 using System.CommandLine;
+using System.Globalization;
 using static DotSights.Core.DotSights;
 
 namespace DotSights.CLI.Commands
@@ -13,10 +16,10 @@ namespace DotSights.CLI.Commands
             if (c.Text.Length > 25)
                 c.Text = c.Text.Substring(0, 25) + "...";
 
-            if(c.Position.X == 0)
+            if (c.Position.X == 0)
                 c.Color = ConsoleColor.Gray;
 
-            if(c.Position.X == 2)
+            if (c.Position.X == 2)
                 c.Color = ConsoleColor.Yellow;
         };
         public DisplayCommand() : base("display", "Displays data tracked by DotSights directly on the terminal")
@@ -29,6 +32,7 @@ namespace DotSights.CLI.Commands
             AddCommand(new AllTimeCommand());
             AddCommand(new WeekCommand());
             AddCommand(new AllCommand());
+            AddCommand(new OverallCommand());
 
             root.Add(this);
         }
@@ -202,6 +206,98 @@ namespace DotSights.CLI.Commands
                 ApplyTableTemplate(t);
 
                 Utils.EnterInteractableMode(t);
+            }
+        }
+
+        private class OverallCommand : Command
+        {
+            public OverallCommand() : base("overall", "Displays overall data such as most used process, most active day of week and hours")
+            {
+                var showInfoOption = new Option<bool?>(new[] { "--showinfo", "-i" }, "Show info such as most used process, most active day of week and hours");
+                var showGraphsOption = new Option<bool?>(new[] { "--showgraphs", "-g" }, "Show graphs for usage per day of week and hour of day");
+
+                this.AddOption(showInfoOption);
+                this.AddOption(showGraphsOption);
+
+                this.SetHandler(Execute, showInfoOption, showGraphsOption);
+            }
+
+            public void Execute(bool? showInfo, bool? showGraphs)
+            {
+                if (showInfo == null)
+                    showInfo = true;
+
+                var data = GetDataFromDataPath();
+                ActivityData total = data.Aggregate((acc, d) => acc + d);
+                bool is24Hour = DateTimeFormatInfo.CurrentInfo.ShortTimePattern.Contains("H");
+                var timePattern = is24Hour ? "HH" : "h tt";
+                if (showInfo == true)
+                {
+
+                    Console.WriteLine("Most used process: " + data.MaxBy(d => d.FocusedTimeInSeconds).ProcessName);
+                    Console.WriteLine("Most active day of week: " + DateTimeFormatInfo.CurrentInfo.GetDayName(total.UsageTimePerWeekDay.MaxBy(kv => kv.Value).Key));
+                    Console.WriteLine("Most active hour of day: " + DateTime.Today.AddHours(total.UsageTimePerHour.MaxBy(kv => kv.Value).Key).ToString(timePattern));
+                    Console.WriteLine("Most active month: " + CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(total.UsageTimePerMonth.MaxBy(kv => kv.Value).Key));
+                    Console.WriteLine();
+
+                }
+
+                if(showGraphs == true)
+                {
+
+                    Graph<KeyValuePair<DayOfWeek, int>> dowGraph = new Graph<KeyValuePair<DayOfWeek, int>>(total.UsageTimePerWeekDay.OrderBy(kv => kv.Key))
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => DateTimeFormatInfo.CurrentInfo.GetAbbreviatedDayName(kv.Key))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseHeader("Usage per day of week")
+                        .UseYAxisPadding(1);
+                    dowGraph.Write();
+                    Console.WriteLine();
+                    var hourlyUsage = total.UsageTimePerHour;
+                    if (hourlyUsage.Count > 12 && hourlyUsage.Count < 24)
+                    {
+                        hourlyUsage = hourlyUsage.Concat(Enumerable.Range(0, 24).Except(hourlyUsage.Select(kv => kv.Key)).Select(h => new KeyValuePair<int, int>(h, 0))).OrderBy(kv => kv.Key).ToDictionary();
+                    }
+
+                    var todGraph = new Graph<KeyValuePair<int, int>>(hourlyUsage)
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => DateTime.Today.AddHours(kv.Key).ToString(timePattern))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseMaxValue(total.UsageTimePerHour.MaxBy(kvp => kvp.Value).Value * 1.1)
+                        .UseMinValue(total.UsageTimePerHour.MinBy(kvp => kvp.Value).Value)
+                        .UseHeader("Usage per hour of day")
+                        .UseYAxisPadding(1);
+
+                    if (hourlyUsage.Count > 12)
+                    {
+                        foreach (var page in todGraph.ToPaginatedGraph(12))
+                        {
+                            page.Write();
+                            Console.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        todGraph.Write();
+                    }
+
+                    var monthlyGraph = new Graph<KeyValuePair<int, int>>(total.UsageTimePerMonth)
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(kv.Key))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseHeader("Usage per month")
+                        .UseYAxisPadding(1);
+
+                    monthlyGraph.Write();
+                    Console.WriteLine();
+                    Console.WriteLine();
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Lack of data for some hours, days or months means either no activity was tracked or the data is not available.");
+                    Console.ResetColor();
+                }
+                
+
             }
         }
     }

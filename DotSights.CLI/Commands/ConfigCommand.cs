@@ -25,6 +25,7 @@ namespace DotSights.CLI.Commands
 			AddCommand(new RegexCommand());
 			AddCommand(new OpenCommand());
 			AddCommand(new SquashCommand());
+			AddCommand(new RestoreBackupCommand());
 
 			var groupItemsWithSameProcessName = new Option<bool?>(new[] { "--groupprocesses", "-gp" }, "Group items with the same process name");
 			var groupItemsUsingGroupingRules = new Option<bool?>(new[] { "--userules", "-u" }, "Group items using grouping rules");
@@ -474,5 +475,60 @@ namespace DotSights.CLI.Commands
 				}
 			}
 		}
+
+		private class RestoreBackupCommand : Command
+		{
+            public RestoreBackupCommand() : base("restore", "Restore a backup file.")
+			{
+                this.SetHandler(Execute);
+            }
+
+			private void Execute()
+			{
+				var current = GetDataFromDataPath();
+				var backupFiles = Directory.GetFiles(AppDataPath, "*.backup");
+				if (backupFiles == null || backupFiles.Length == 0)
+				{
+                    Console.WriteLine("No backup files found.");
+                    return;
+                }
+
+				var backupTotalData = new List<ActivityData>();
+				foreach (var file in backupFiles)
+				{
+                    var data = GetDataFromBackup(file);
+					ActivityData total = data.Aggregate((a, b) => a + b);
+					backupTotalData.Add(total);
+                }
+
+				var table = new Table()
+					.DisplayRowIndexes()
+					.SetHeader(new Row("File Name", "Total time tracked for backup"));
+
+				for(int i = 0; i < backupTotalData.Count; i++)
+				{
+					table.AddRow(new(Path.GetFileName(backupFiles[i]), DotFormatting.FormatTimeShort((int)backupTotalData[i].FocusedTimeInSeconds)));
+                }
+                table.AddRow(new Row("Current", DotFormatting.FormatTimeShort((int)current.Aggregate((a, b) => a + b).FocusedTimeInSeconds)));
+
+                table.Write();
+
+				Console.WriteLine("Enter the number of the backup file to restore:");
+				Console.Write(">");
+				var input = Console.ReadLine();
+
+				if (int.TryParse(input, out int index) && index > 0 && index <= backupTotalData.Count)
+				{
+                    var backupFile = backupFiles[index - 1];
+                    var data = GetDataFromBackup(backupFile);
+                    SaveDataToDataPath(data);
+                    Console.WriteLine("Restored backup file.");
+                }
+                else
+				{
+                    Console.WriteLine("Invalid input.");
+                }
+            }
+        }
 	}
 }

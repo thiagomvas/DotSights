@@ -98,6 +98,20 @@ public static class DotSights
         }
         return new List<ActivityData>();
     }
+    public static List<ActivityData> GetDataFromBackup(string fileName)
+    {
+        var path = Path.Combine(AppDataPath, fileName);
+
+        if (File.Exists(path))
+        {
+            string data = File.ReadAllText(path);
+            if (DeserializeData(data, out List<ActivityData>? result))
+            {
+                return result ?? new List<ActivityData>();
+            }
+        }
+        return new List<ActivityData>();
+    }
 
     public static async Task<List<ActivityData>> GetDataFromDataPathAsync()
     {

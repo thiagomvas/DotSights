@@ -26,6 +26,7 @@ namespace DotSights.CLI.Commands
 			AddCommand(new OpenCommand());
 			AddCommand(new SquashCommand());
 			AddCommand(new RestoreBackupCommand());
+			AddCommand(new CreateBackupCommand());
 
 			var groupItemsWithSameProcessName = new Option<bool?>(new[] { "--groupprocesses", "-gp" }, "Group items with the same process name");
 			var groupItemsUsingGroupingRules = new Option<bool?>(new[] { "--userules", "-u" }, "Group items using grouping rules");
@@ -530,5 +531,21 @@ namespace DotSights.CLI.Commands
                 }
             }
         }
+
+		private class CreateBackupCommand : Command
+		{
+            public CreateBackupCommand() : base("backup", "Create a backup of the current data.")
+			{
+                this.SetHandler(Execute);
+            }
+
+            private void Execute()
+			{
+                var data = GetDataFromDataPath();
+                var backupFile = Path.Combine(AppDataPath, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.backup");
+				CreateNewDataBackup();	
+                Console.WriteLine($"Created backup file: {backupFile}");
+            }
+		}
 	}
 }

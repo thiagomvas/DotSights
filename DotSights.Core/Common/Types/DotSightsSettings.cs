@@ -12,6 +12,8 @@
 
 		#region Tracker Settings
 		public TimeSpan TrackerSaveInterval { get; set; } = TimeSpan.FromMinutes(15);
+		public TimeSpan DataBackupInterval { get; set; } = TimeSpan.FromDays(5);
+		public int MaxBackupFileCount = 5;
 		public bool OptimizeForStorageSpace { get; set; } = false;
 		public List<string> GroupedProcessNames { get; set; } = new();
 

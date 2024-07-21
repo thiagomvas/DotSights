@@ -26,23 +26,10 @@ namespace DotSights.Core.Common
 
         public void AddData(ActivityData data)
         {
-
-            DailyData today = dailyDatas.FirstOrDefault(d => d.Date.Date == DateTime.Now.Date);
-            if (today == null)
-            {
-                today = new DailyData { Date = DateTime.Now.Date };
-                dailyDatas.Add(today);
-            }
-            
-            // Ensure only track 7 days of data
-            if (dailyDatas.OrderBy(d => d.Date).Count() > 7)
-            {
-                dailyDatas.RemoveAt(0);
-            }
-
+            AddDataToDaily(data);
 
             ActivityData match = null;
-            if(_settings.OptimizeForStorageSpace)
+            if (_settings.OptimizeForStorageSpace)
             {
                 match = activities.Where(x => x.ProcessName.ToLower() == data.ProcessName.ToLower()).FirstOrDefault();
             }
@@ -50,9 +37,34 @@ namespace DotSights.Core.Common
             {
                 match = activities.FirstOrDefault(x => x.WindowTitle == data.WindowTitle);
             }
+            if (match != null)
+            {
+                activities[activities.IndexOf(match)] += data;
+            }
+            else
+            {
+                activities.Add(data);
+            }
+
+        }
+
+        private void AddDataToDaily(ActivityData data)
+        {
+            DailyData today = dailyDatas.FirstOrDefault(d => d.Date.Date == DateTime.Now.Date);
+            if (today == null)
+            {
+                today = new DailyData { Date = DateTime.Now.Date };
+                dailyDatas.Add(today);
+            }
+
+            // Ensure only track 7 days of data
+            if (dailyDatas.OrderBy(d => d.Date).Count() > 7)
+            {
+                dailyDatas.RemoveAt(0);
+            }
 
             // Update the data
-            foreach(var (hour, time) in data.UsageTimePerHour)
+            foreach (var (hour, time) in data.UsageTimePerHour)
             {
                 if (today.UsageTimePerHour.ContainsKey(hour))
                 {
@@ -63,17 +75,6 @@ namespace DotSights.Core.Common
                     today.UsageTimePerHour[hour] = time;
                 }
             }
-
-
-            if (match != null)
-            {
-                activities[activities.IndexOf(match)] += data;
-            }
-            else
-            {
-                activities.Add(data);
-            }
-
         }
 
         public void SaveChanges()

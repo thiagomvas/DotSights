@@ -63,15 +63,17 @@ namespace DotSights.CLI.Commands
                 var optionShowAll = new Option<bool>(new[] { "--showall", "-s" }, "Ignore Regex Grouping rules (if any) and show all the data tracked");
                 var optionOrderAlphabetical = new Option<bool>(new[] { "--orderalphabetical", "-a" }, "Order data alphabetically");
                 var optionOrderTime = new Option<bool>(new[] { "--ordertime", "-t" }, "Order data by time");
+                var optionDateOffset = new Option<int>(new[] { "--dateoffset", "-d" }, "Display the daily data for 'n' days ago. 0 is today, 6 is 6 days ago (max). Does not show activities for previous days");
 
                 this.AddOption(optionShowAll);
                 this.AddOption(optionOrderAlphabetical);
                 this.AddOption(optionOrderTime);
+                this.AddOption(optionDateOffset);
 
-                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime);
+                this.SetHandler(Execute, optionShowAll, optionOrderAlphabetical, optionOrderTime, optionDateOffset);
             }
 
-            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime)
+            private void Execute(bool showAll, bool orderAlphabetical, bool orderTime, int dateOffset)
             {
                 var data = SetupData(showAll, orderAlphabetical, orderTime);
                 data = data.Where(d => d.TotalTimeToday > 0).ToList();
@@ -89,8 +91,52 @@ namespace DotSights.CLI.Commands
                 t.SetHeader(new("Process name", "Title", "Usage time"));
 
                 ApplyTableTemplate(t);
+                if(dateOffset == 0)
+                    t.Write();
 
-                Utils.EnterInteractableMode(t);
+                var dailyhourly = GetDailyDataFromDataPath().OrderByDescending(d => d.Date).ToArray()[dateOffset].UsageTimePerHour;
+                var max = dailyhourly.Max(kvp => kvp.Value);
+                var min = dailyhourly.Min(kvp => kvp.Value);
+                for(int i = 0; i < DateTime.Now.Hour; i++)
+                {
+                    if (!dailyhourly.ContainsKey(i))
+                        dailyhourly.Add(i, 0);
+                }
+                dailyhourly = dailyhourly.OrderBy(KeyValuePair => KeyValuePair.Key).ToDictionary();
+                if(DateTime.Now.Hour >= 12)
+                {
+                    var graph1 = new Graph<KeyValuePair<int, int>>(dailyhourly.Where(kvp => kvp.Key < 12))
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => kv.Key.ToString("0"))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseMinValue(min)
+                        .UseMaxValue(max)
+                        .UseHeader("Hourly Usage (Day)")
+                        .UseYAxisPadding(1);
+                    graph1.Write();
+                    Console.WriteLine();
+                    var graph2 = new Graph<KeyValuePair<int, int>>(dailyhourly.Where(kvp => kvp.Key >= 12))
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => kv.Key.ToString("0"))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseHeader("Hourly Usage (Night)")
+                        .UseMinValue(min)
+                        .UseMaxValue(max)
+                        .UseYAxisPadding(1);
+                    graph2.Write();
+                }
+                else
+                {
+                    var graph = new Graph<KeyValuePair<int, int>>(dailyhourly.Take(12))
+                        .UseValueGetter(kv => kv.Value)
+                        .UseXTickFormatter(kv => kv.Key.ToString("0"))
+                        .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                        .UseMinValue(min)
+                        .UseMaxValue(max)
+                        .UseHeader("Hourly Usage")
+                        .UseYAxisPadding(1);
+                    graph.Write();
+                }
             }
         }
         private class AllTimeCommand : Command
@@ -166,7 +212,26 @@ namespace DotSights.CLI.Commands
 
                 ApplyTableTemplate(t);
 
-                Utils.EnterInteractableMode(t);
+                t.Write();
+
+                Dictionary<DayOfWeek, int> usagePerDayOfWeek = new();
+                // Fill with current week data. If data is missing, fill with 0
+                DateTime today = DateTime.Today;
+                DateTime startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+                DateTime endOfWeek = startOfWeek.AddDays(7);
+                for (DateTime date = startOfWeek; date < endOfWeek; date = date.AddDays(1))
+                {
+                    usagePerDayOfWeek[date.DayOfWeek] = data.Sum(d => d.Last7DaysUsage.GetValueOrDefault(date, 0));
+                }
+
+                var graph = new Graph<KeyValuePair<DayOfWeek, int>>(usagePerDayOfWeek.OrderBy(kv => kv.Key))
+                    .UseValueGetter(kv => kv.Value)
+                    .UseXTickFormatter(kv => DateTimeFormatInfo.CurrentInfo.GetAbbreviatedDayName(kv.Key))
+                    .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
+                    .UseHeader("Usage per day of week")
+                    .UseYAxisPadding(1);
+
+                graph.Write();
             }
         }
 

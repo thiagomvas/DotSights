@@ -51,31 +51,8 @@ namespace DotSights.Core.Common
                 match = activities.FirstOrDefault(x => x.WindowTitle == data.WindowTitle);
             }
 
-
-            // Get delta time for each hour
-            Dictionary<int, int> increments = new();
-            foreach (var (hour, time) in data.UsageTimePerHour)
-            {
-                // Compare with existing data
-                if (match != null)
-                {
-                    if (match.UsageTimePerHour.ContainsKey(hour))
-                    {
-                        increments[hour] = data.UsageTimePerHour[hour];
-                    }
-                    else
-                    {
-                        increments[hour] = time;
-                    }
-                }
-                else
-                {
-                    increments[hour] = time;
-                }
-            }
-
             // Update the data
-            foreach(var (hour, time) in increments)
+            foreach(var (hour, time) in data.UsageTimePerHour)
             {
                 if (today.UsageTimePerHour.ContainsKey(hour))
                 {

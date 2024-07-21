@@ -12,6 +12,7 @@ public static class DotSights
 {
     public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
     public static string DataFilePath => Path.Combine(AppDataPath, "DotSights.Data.json");
+    public static string DailyDataFilePath => Path.Combine(AppDataPath, $"DotSights.Daily.json");
     public static string SettingsFilePath => Path.Combine(AppDataPath, "DotSights.Settings.json");
     public static string TrackerFilePath => Path.Combine(AppDataPath, "DotSights.Tracker.exe");
 
@@ -72,11 +73,30 @@ public static class DotSights
         return JsonSerializer.Serialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default);
     }
 
+    public static string SerializeData(List<DailyData> data)
+    {
+        return JsonSerializer.Serialize(data, typeof(List<DailyData>), DailyDataGenerationContext.Default);
+    }
+
     public static bool DeserializeData(string data, out List<ActivityData>? result)
     {
         try
         {
             result = JsonSerializer.Deserialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default) as List<ActivityData>;
+            return true;
+        }
+        catch (Exception)
+        {
+            result = null;
+            return false;
+        }
+    }
+
+    public static bool DeserializeData(string data, out List<DailyData>? result)
+    {
+        try
+        {
+            result = JsonSerializer.Deserialize(data, typeof(List<DailyData>), DailyDataGenerationContext.Default) as List<DailyData>;
             return true;
         }
         catch (Exception)
@@ -97,6 +117,18 @@ public static class DotSights
             }
         }
         return new List<ActivityData>();
+    }
+    public static List<DailyData> GetDailyDataFromDataPath()
+    {
+        if (File.Exists(DailyDataFilePath))
+        {
+            string data = File.ReadAllText(DailyDataFilePath);
+            if (DeserializeData(data, out List<DailyData>? result))
+            {
+                return result ?? new List<DailyData>();
+            }
+        }
+        return new List<DailyData>();
     }
     public static List<ActivityData> GetDataFromBackup(string fileName)
     {

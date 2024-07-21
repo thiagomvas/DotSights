@@ -12,4 +12,10 @@ namespace DotSights.Core.Common.Types
 	internal partial class DotSightSettingsGenerationContext : JsonSerializerContext
 	{
 	}
+
+	[JsonSerializable(typeof(List<DailyData>))]
+	[JsonSourceGenerationOptions(WriteIndented = true)]
+	internal partial class DailyDataGenerationContext : JsonSerializerContext
+	{
+    }
 }

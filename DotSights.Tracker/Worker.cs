@@ -1,3 +1,4 @@
+using DotSights.Core.Common;
 using DotSights.Core.Common.Types;
 using System.Diagnostics;
 using System.Linq;
@@ -88,51 +89,16 @@ namespace DotSights.Tracker
         }
         private async Task SaveData()
         {
-            Dictionary<string, ActivityData> data = new();
-            var loadeddata = Core.DotSights.GetDataFromDataPath();
+            var db = new DotsightsDB();
+            db.LoadDataFromFile();
 
-            if (loadeddata != null)
+            foreach (var data in trackedData)
             {
-                foreach (var activity in loadeddata)
-                {
-                    data.Add(activity.WindowTitle, activity);
-                }
+                db.AddData(data.Value);
             }
 
+            db.SaveChanges();
 
-            // Iterate over tracked data, and increment the total time for each activity
-            foreach (var (key, activity) in trackedData)
-            {
-                if (settings.OptimizeForStorageSpace && settings.GroupedProcessNames.Any(p => string.Equals(p, activity.ProcessName, StringComparison.OrdinalIgnoreCase)))
-                {
-                    var match = data.Values.Where(x => x.ProcessName.ToLower() == activity.ProcessName.ToLower()).FirstOrDefault();
-                    if (match != null)
-                    {
-                        data[match.WindowTitle] += activity;
-                    }
-                    else
-                    {
-                        data.Add(key, activity);
-                    }
-                }
-                else
-                {
-                    if (data.ContainsKey(key))
-                    {
-                        data[key] += activity;
-                    }
-                    else
-                    {
-                        data.Add(key, activity);
-                    }
-                }
-
-            }
-
-
-
-            var json = Core.DotSights.SerializeData(data.Values.ToList());
-            await File.WriteAllTextAsync(Core.DotSights.DataFilePath, json);
             trackedData.Clear();
         }
         public override Task StopAsync(CancellationToken cancellationToken)

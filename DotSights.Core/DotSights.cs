@@ -10,11 +10,11 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
-    public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
-    public static string DataFilePath => Path.Combine(AppDataPath, "DotSights.Data.json");
-    public static string DailyDataFilePath => Path.Combine(AppDataPath, $"DotSights.Daily.json");
-    public static string SettingsFilePath => Path.Combine(AppDataPath, "DotSights.Settings.json");
-    public static string TrackerFilePath => Path.Combine(AppDataPath, "DotSights.Tracker.exe");
+    public static string AppDataPath { get; private set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
+    public static string DataFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Data.json");
+    public static string DailyDataFilePath { get; private set; } = Path.Combine(AppDataPath, $"DotSights.Daily.json");
+    public static string SettingsFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Settings.json");
+    public static string TrackerFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Tracker.exe");
 
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
@@ -494,6 +494,10 @@ public static class DotSights
         }
     }
 
-
+    public static void SetDataPath(string dataPath, string dailyDataPath)
+    {
+        DataFilePath = Path.Combine(AppDataPath, dataPath);
+        DailyDataFilePath = Path.Combine(AppDataPath, dailyDataPath);
+    }
 }
 

@@ -94,10 +94,19 @@ namespace DotSights.CLI.Commands
                 if(dateOffset == 0)
                     t.Write();
 
-                var dailyhourly = GetDailyDataFromDataPath().OrderByDescending(d => d.Date).ToArray()[dateOffset].UsageTimePerHour;
+
+                var dailydata = GetDailyDataFromDataPath();
+                if (dailydata == null || dailydata.Count == 0)
+                    return;
+                if (dateOffset >= dailydata.Count)
+                    dateOffset = dailydata.Count - 1;
+
+                var dailyhourly = dailydata.OrderByDescending(d => d.Date).ToArray()[dateOffset].UsageTimePerHour;
                 var max = dailyhourly.Max(kvp => kvp.Value);
                 var min = dailyhourly.Min(kvp => kvp.Value);
-                for(int i = 0; i < DateTime.Now.Hour; i++)
+
+                var n = dateOffset > 0 ? 24 : DateTime.Now.Hour;
+                for(int i = 0; i < n; i++)
                 {
                     if (!dailyhourly.ContainsKey(i))
                         dailyhourly.Add(i, 0);
@@ -111,7 +120,7 @@ namespace DotSights.CLI.Commands
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
                         .UseMinValue(min)
                         .UseMaxValue(max)
-                        .UseHeader("Hourly Usage (Day)")
+                        .UseHeader($"Hourly Usage (Day) - {DateOnly.FromDateTime(DateTime.Today).ToShortDateString()}")
                         .UseYAxisPadding(1);
                     graph1.Write();
                     Console.WriteLine();
@@ -119,7 +128,7 @@ namespace DotSights.CLI.Commands
                         .UseValueGetter(kv => kv.Value)
                         .UseXTickFormatter(kv => kv.Key.ToString("0"))
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
-                        .UseHeader("Hourly Usage (Night)")
+                        .UseHeader($"Hourly Usage (Night) - {DateOnly.FromDateTime(DateTime.Today).ToShortDateString()}")
                         .UseMinValue(min)
                         .UseMaxValue(max)
                         .UseYAxisPadding(1);
@@ -133,7 +142,7 @@ namespace DotSights.CLI.Commands
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
                         .UseMinValue(min)
                         .UseMaxValue(max)
-                        .UseHeader("Hourly Usage")
+                        .UseHeader($"Hourly Usage  - {DateOnly.FromDateTime(DateTime.Today).ToShortDateString()}")
                         .UseYAxisPadding(1);
                     graph.Write();
                 }

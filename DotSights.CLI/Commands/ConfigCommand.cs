@@ -234,11 +234,11 @@ namespace DotSights.CLI.Commands
                 });
 
                 t.UseNullOrEmptyReplacement("N/A");
-                t.SetHeader(new("Name", "Value"));
+                t.SetHeader("Name", "Value");
                 t.Header.Cells.ForEach(c => c.Alignment = Alignment.Center);
 
 
-                t.AddRow(new("Grouped Processes", string.Join(',', settings.GroupedProcessNames)));
+                t.AddRow("Grouped Processes", string.Join(',', settings.GroupedProcessNames));
 
                 t.UsePreset(c =>
                 {
@@ -265,7 +265,7 @@ namespace DotSights.CLI.Commands
                 });
 
                 groupingTable.UseNullOrEmptyReplacement("N/A");
-                groupingTable.SetHeader(new("Name", "Regex Query", "Display"));
+                groupingTable.SetHeader("Name", "Regex Query", "Display");
                 groupingTable.UsePreset(c =>
                 {
                     if (c.Position.X == 2)
@@ -436,7 +436,7 @@ namespace DotSights.CLI.Commands
                     var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
                     return new Row(name, totaltime, timetoday, timeweek);
                 });
-                t.SetHeader(new("Name", "Total Time", "Today", "Week"));
+                t.SetHeader("Name", "Total Time", "Today", "Week");
                 t.Write();
 
                 var squash = SquashDataUsingRule(data, rule, matchProcessNames);
@@ -453,7 +453,7 @@ namespace DotSights.CLI.Commands
                         var timeweek = DotFormatting.FormatTimeShort(d.GetUsageTimeForWeek());
                         return new Row(name, totaltime, timetoday, timeweek);
                     });
-                    t2.SetHeader(new("Name", "Total Time", "Today", "Week"));
+                    t2.SetHeader("Name", "Total Time", "Today", "Week");
                     t2.Write();
                 }
                 else
@@ -508,7 +508,7 @@ namespace DotSights.CLI.Commands
 
                 for (int i = 0; i < backupTotalData.Count; i++)
                 {
-                    table.AddRow(new(Path.GetFileName(backupFiles[i]), DotFormatting.FormatTimeShort((int)backupTotalData[i].FocusedTimeInSeconds)));
+                    table.AddRow(Path.GetFileName(backupFiles[i]), DotFormatting.FormatTimeShort((int)backupTotalData[i].FocusedTimeInSeconds));
                 }
                 table.AddRow(new Row("Current", DotFormatting.FormatTimeShort((int)current.Aggregate((a, b) => a + b).FocusedTimeInSeconds)));
 

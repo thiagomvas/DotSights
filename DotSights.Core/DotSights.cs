@@ -10,9 +10,21 @@ namespace DotSights.Core;
 
 public static class DotSights
 {
+    /// <summary>
+    /// The path to the AppData folder
+    /// </summary>
     public static string AppDataPath { get; private set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DotSights");
+    /// <summary>
+    /// The path to the data file inside AppData
+    /// </summary>
     public static string DataFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Data.json");
+    /// <summary>
+    /// The path to the daily tracked data file inside AppData
+    /// </summary>
     public static string DailyDataFilePath { get; private set; } = Path.Combine(AppDataPath, $"DotSights.Daily.json");
+    /// <summary>
+    /// The path to the  settings file inside AppData
+    /// </summary>
     public static string SettingsFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Settings.json");
     public static string TrackerFilePath { get; private set; } = Path.Combine(AppDataPath, "DotSights.Tracker.exe");
 
@@ -25,7 +37,10 @@ public static class DotSights
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-
+    /// <summary>
+    /// Gets the window title of the current focused window.
+    /// </summary>
+    /// <returns>The focused window title</returns>
     public static string GetFocusedWindow()
     {
         IntPtr foregroundWindowHandle = GetForegroundWindow();
@@ -39,6 +54,10 @@ public static class DotSights
         return "";
     }
 
+    /// <summary>
+    /// Gets the process name of the currently focused program.
+    /// </summary>
+    /// <returns>The currently focused process name</returns>
     public static string GetFocusedProcessName()
     {
         IntPtr foregroundWindowHandle = GetForegroundWindow();
@@ -51,11 +70,19 @@ public static class DotSights
         return "";
     }
 
+    /// <summary>
+    /// Saves the settings to the settings file
+    /// </summary>
+    /// <param name="settings">The settings to save</param>
     public static void SaveSettings(DotSightsSettings settings)
     {
         File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(settings, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
     }
 
+    /// <summary>
+    /// Loads the setting from the file and parses it to a <see cref="DotSightsSettings"/>
+    /// </summary>
+    /// <returns>The parsed <see cref="DotSightsSettings"/></returns>
     public static DotSightsSettings LoadSettings()
     {
         if (File.Exists(SettingsFilePath))
@@ -68,16 +95,33 @@ public static class DotSights
         File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(new DotSightsSettings(), typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
         return new DotSightsSettings();
     }
+
+    /// <summary>
+    /// Serializes a list of activity data to json
+    /// </summary>
+    /// <param name="data">The data to serialize</param>
+    /// <returns>The json result</returns>
     public static string SerializeData(List<ActivityData> data)
     {
         return JsonSerializer.Serialize(data, typeof(List<ActivityData>), ActivityDataListGenerationContext.Default);
     }
 
+    /// <summary>
+    /// Serializes a list of daily data to json
+    /// </summary>
+    /// <param name="data">The data to serialize</param>
+    /// <returns>The json result</returns>
     public static string SerializeData(List<DailyData> data)
     {
         return JsonSerializer.Serialize(data, typeof(List<DailyData>), DailyDataGenerationContext.Default);
     }
 
+    /// <summary>
+    /// Tries to deserialize a json string to a list of activity data
+    /// </summary>
+    /// <param name="data">The json to parse</param>
+    /// <param name="result">The resulting object if it is successful</param>
+    /// <returns><see langword="true"/> if its parsed successfully and <paramref name="result"/> is not null, <see langword="false"/> otherwise</returns>
     public static bool DeserializeData(string data, out List<ActivityData>? result)
     {
         try
@@ -92,6 +136,12 @@ public static class DotSights
         }
     }
 
+    /// <summary>
+    /// Tries to deserialize a json string to a list of activity data
+    /// </summary>
+    /// <param name="data">The json to parse</param>
+    /// <param name="result">The resulting object if it is successful</param>
+    /// <returns><see langword="true"/> if its parsed successfully and <paramref name="result"/> is not null, <see langword="false"/> otherwise</returns>
     public static bool DeserializeData(string data, out List<DailyData>? result)
     {
         try
@@ -106,6 +156,10 @@ public static class DotSights
         }
     }
 
+    /// <summary>
+    /// Deserializes all the activity data from the data file.
+    /// </summary>
+    /// <returns>The resulting parsed data</returns>
     public static List<ActivityData> GetDataFromDataPath()
     {
         if (File.Exists(DataFilePath))
@@ -118,6 +172,11 @@ public static class DotSights
         }
         return new List<ActivityData>();
     }
+
+    /// <summary>
+    /// Deserializes all the daily data from the data file.
+    /// </summary>
+    /// <returns>The resulting parsed data</returns>
     public static List<DailyData> GetDailyDataFromDataPath()
     {
         if (File.Exists(DailyDataFilePath))
@@ -130,6 +189,11 @@ public static class DotSights
         }
         return new List<DailyData>();
     }
+    /// <summary>
+    /// Reads and parses the data from a data file backup
+    /// </summary>
+    /// <param name="fileName">The data file name with extension</param>
+    /// <returns>The parsed data if exists</returns>
     public static List<ActivityData> GetDataFromBackup(string fileName)
     {
         var path = Path.Combine(AppDataPath, fileName);
@@ -163,7 +227,10 @@ public static class DotSights
         File.WriteAllText(DataFilePath, SerializeData(data));
     }
 
-
+    /// <summary>
+    /// Creates data charts from a list of activity data and saves to a PNG.
+    /// </summary>
+    /// <param name="data">The data to generate graphs</param>
     public static void CreateDataCharts(List<ActivityData> data)
     {
 
@@ -220,6 +287,12 @@ public static class DotSights
 
         plot2.SavePng("HourlyTimeUsagePlot.png", 1080, 540);
     }
+    /// <summary>
+    /// Filters data from a list of activity data using the grouping rules in the settings.
+    /// </summary>
+    /// <param name="data">The data to filter</param>
+    /// <param name="settings">The settings to use</param>
+    /// <returns>The filtered result</returns>
     public static List<ActivityData> FilterDataFromRules(List<ActivityData> data, DotSightsSettings settings)
     {
         List<ActivityData> matches = new();
@@ -261,6 +334,13 @@ public static class DotSights
         else return data.Except(matchedItems).Concat(matches).ToList();
 
     }
+
+    /// <summary>
+    /// Filters data from a list of activity data using all the options in the settings object
+    /// </summary>
+    /// <param name="data">The data to filter</param>
+    /// <param name="settings">The settings to use</param>
+    /// <returns>The filtered result</returns>
     public static List<ActivityData> FilterDataFromSettings(List<ActivityData> data, DotSightsSettings settings)
     {
         List<ActivityData> result = data.Select(x => x).ToList();
@@ -287,6 +367,9 @@ public static class DotSights
         return result;
     }
 
+    /// <summary>
+    /// Makes sure the AppData/DotSights folder exists, and the settings and data files also exist
+    /// </summary>
     public static void AssureSetup()
     {
         if (!Directory.Exists(AppDataPath))
@@ -322,6 +405,11 @@ public static class DotSights
     {
         File.Copy(path, TrackerFilePath, true);
     }
+
+    /// <summary>
+    /// Creates data chards for an activity(weekly and hourly use)
+    /// </summary>
+    /// <param name="data">The data to generate charts</param>
 
     public static void CreateDataChartForActivity(ActivityData data)
     {
@@ -463,6 +551,10 @@ public static class DotSights
         else return data;
     }
 
+    /// <summary>
+    /// Gets the date of when the last backup was created
+    /// </summary>
+    /// <returns>The date of the last created backup</returns>
     public static DateTime GetLastBackupDate()
     {
         // Check for backup files
@@ -475,12 +567,19 @@ public static class DotSights
         return DateTime.MinValue;
     }
 
+    /// <summary>
+    /// Creates a new data backup in the AppData folder
+    /// </summary>
     public static void CreateNewDataBackup()
     {
         string backupPath = Path.Combine(AppDataPath, $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.backup");
         File.Copy(DataFilePath, backupPath);
     }
 
+    /// <summary>
+    /// Makes sure there arent more than <paramref name="maxFileCount"/> backups, if there are, delete the older ones
+    /// </summary>
+    /// <param name="maxFileCount">The max number of backups</param>
     public static void AssureBackupFileCount(int maxFileCount)
     {
         var files = Directory.GetFiles(AppDataPath, "*.backup", SearchOption.TopDirectoryOnly);
@@ -494,6 +593,11 @@ public static class DotSights
         }
     }
 
+    /// <summary>
+    /// Sets the file name for the data files path.
+    /// </summary>
+    /// <param name="dataPath">The file name for the data path</param>
+    /// <param name="dailyDataPath">The file name for the daily data path</param>
     public static void SetDataPath(string dataPath, string dailyDataPath)
     {
         DataFilePath = Path.Combine(AppDataPath, dataPath);

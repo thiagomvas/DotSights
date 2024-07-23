@@ -1,8 +1,6 @@
 using DotSights.Core.Common;
 using DotSights.Core.Common.Types;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace DotSights.Tracker
 {

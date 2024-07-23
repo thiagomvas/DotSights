@@ -1,6 +1,4 @@
-﻿using System.Runtime;
-
-namespace DotSights.Core.Common.Types
+﻿namespace DotSights.Core.Common.Types
 {
     public class DailyData
     {

@@ -1,59 +1,59 @@
 ﻿namespace DotSights.Core.Common.Utils
 {
-	public static class DotFormatting
-	{
-		public static string FormatTimeShort(int seconds)
-		{
-			if (seconds <= 0)
-				return "0s";
+    public static class DotFormatting
+    {
+        public static string FormatTimeShort(int seconds)
+        {
+            if (seconds <= 0)
+                return "0s";
 
-			int hours = seconds / 3600;
-			int minutes = (seconds % 3600) / 60;
-			int secs = seconds % 60;
+            int hours = seconds / 3600;
+            int minutes = (seconds % 3600) / 60;
+            int secs = seconds % 60;
 
-			string formattedTime = "";
+            string formattedTime = "";
 
-			if (hours > 0)
-				formattedTime += $"{hours}h ";
+            if (hours > 0)
+                formattedTime += $"{hours}h ";
 
-			if (minutes > 0)
-				formattedTime += $"{minutes}m ";
+            if (minutes > 0)
+                formattedTime += $"{minutes}m ";
 
-			if (secs > 0)
-				formattedTime += $"{secs}s";
+            if (secs > 0)
+                formattedTime += $"{secs}s";
 
-			return formattedTime;
+            return formattedTime;
 
-		}
+        }
 
-		public static string FormatTimeLong(int seconds)
-		{
-			if (seconds <= 0)
-				return "0 seconds";
+        public static string FormatTimeLong(int seconds)
+        {
+            if (seconds <= 0)
+                return "0 seconds";
 
-			int hours = seconds / 3600;
-			int minutes = (seconds % 3600) / 60;
-			int secs = seconds % 60;
+            int hours = seconds / 3600;
+            int minutes = (seconds % 3600) / 60;
+            int secs = seconds % 60;
 
-			string formattedTime = "";
+            string formattedTime = "";
 
-			if (hours > 0)
-				formattedTime += $"{hours} hours ";
+            if (hours > 0)
+                formattedTime += $"{hours} hours ";
 
-			if (minutes > 0)
-				formattedTime += $"{minutes} minutes ";
+            if (minutes > 0)
+                formattedTime += $"{minutes} minutes ";
 
-			if (secs > 0)
-				formattedTime += $"{secs} seconds";
+            if (secs > 0)
+                formattedTime += $"{secs} seconds";
 
-			return formattedTime;
-		}
+            return formattedTime;
+        }
 
-		public static string FormatHourToComputerClock(int hour)
-		{
-			TimeOnly time = new(hour, 0);
+        public static string FormatHourToComputerClock(int hour)
+        {
+            TimeOnly time = new(hour, 0);
 
-			return time.ToString();
-		}
-	}
+            return time.ToString();
+        }
+    }
 }

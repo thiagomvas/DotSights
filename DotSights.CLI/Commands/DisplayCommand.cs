@@ -2,7 +2,6 @@
 using DotSights.Core.Common.Utils;
 using SharpTables;
 using SharpTables.Graph;
-using System.Collections.Specialized;
 using System.CommandLine;
 using System.Globalization;
 using static DotSights.Core.DotSights;
@@ -91,7 +90,7 @@ namespace DotSights.CLI.Commands
                 t.SetHeader(new("Process name", "Title", "Usage time"));
 
                 ApplyTableTemplate(t);
-                if(dateOffset == 0)
+                if (dateOffset == 0)
                     t.Write();
 
 
@@ -106,13 +105,13 @@ namespace DotSights.CLI.Commands
                 var min = dailyhourly.Min(kvp => kvp.Value);
 
                 var n = dateOffset > 0 ? 24 : DateTime.Now.Hour;
-                for(int i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)
                 {
                     if (!dailyhourly.ContainsKey(i))
                         dailyhourly.Add(i, 0);
                 }
                 dailyhourly = dailyhourly.OrderBy(KeyValuePair => KeyValuePair.Key).ToDictionary();
-                if(DateTime.Now.Hour >= 12)
+                if (DateTime.Now.Hour >= 12)
                 {
                     var graph1 = new Graph<KeyValuePair<int, int>>(dailyhourly.Where(kvp => kvp.Key < 12))
                         .UseValueGetter(kv => kv.Value)
@@ -316,7 +315,7 @@ namespace DotSights.CLI.Commands
 
                 }
 
-                if(showGraphs == true)
+                if (showGraphs == true)
                 {
 
                     Graph<KeyValuePair<DayOfWeek, int>> dowGraph = new Graph<KeyValuePair<DayOfWeek, int>>(total.UsageTimePerWeekDay.OrderBy(kv => kv.Key))
@@ -370,7 +369,7 @@ namespace DotSights.CLI.Commands
                     Console.WriteLine("Lack of data for some hours, days or months means either no activity was tracked or the data is not available.");
                     Console.ResetColor();
                 }
-                
+
 
             }
         }

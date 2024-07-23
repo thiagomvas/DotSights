@@ -1,14 +1,14 @@
 namespace DotSights.Tracker
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			var builder = Host.CreateApplicationBuilder(args);
-			builder.Services.AddHostedService<Worker>();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = Host.CreateApplicationBuilder(args);
+            builder.Services.AddHostedService<Worker>();
 
-			var host = builder.Build();
-			host.Run();
-		}
-	}
+            var host = builder.Build();
+            host.Run();
+        }
+    }
 }

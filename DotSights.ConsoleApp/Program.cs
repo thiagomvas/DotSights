@@ -1,7 +1,5 @@
-﻿using DotSights.Core;
-using DotSights.Core.Common;
+﻿using DotSights.Core.Common;
 using DotSights.Core.Common.Types;
-using DotSights.Core.Common.Utils;
 using SharpTables;
 using SharpTables.Graph;
 using System.Globalization;
@@ -13,7 +11,7 @@ var data1 = new ActivityData
 {
     WindowTitle = "Visual Studio Code",
     ProcessName = "code",
-    FocusedTimeInSeconds = (int) TimeSpan.FromMinutes(1).TotalSeconds,
+    FocusedTimeInSeconds = (int)TimeSpan.FromMinutes(1).TotalSeconds,
     UsageTimePerHour = { { 10, 60 } },
 };
 
@@ -21,7 +19,7 @@ var data2 = new ActivityData
 {
     WindowTitle = "Window 2",
     ProcessName = "data2",
-    FocusedTimeInSeconds = (int) TimeSpan.FromMinutes(1).TotalSeconds,
+    FocusedTimeInSeconds = (int)TimeSpan.FromMinutes(1).TotalSeconds,
 };
 var data3 = new ActivityData
 {

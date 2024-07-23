@@ -87,7 +87,7 @@ namespace DotSights.CLI.Commands
                     return new Row(processName, title, time);
                 });
 
-                t.SetHeader(new("Process name", "Title", "Usage time"));
+                t.SetHeader("Process name", "Title", "Usage time");
 
                 ApplyTableTemplate(t);
                 if (dateOffset == 0)
@@ -104,7 +104,7 @@ namespace DotSights.CLI.Commands
                 var max = dailyhourly.Max(kvp => kvp.Value);
                 var min = dailyhourly.Min(kvp => kvp.Value);
 
-                var n = dateOffset > 0 ? 24 : DateTime.Now.Hour;
+                var n = DateTime.Now.Hour > 12 || dateOffset > 0 ? 24 : DateTime.Now.Hour;
                 for (int i = 0; i < n; i++)
                 {
                     if (!dailyhourly.ContainsKey(i))
@@ -119,7 +119,7 @@ namespace DotSights.CLI.Commands
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
                         .UseMinValue(min)
                         .UseMaxValue(max)
-                        .UseHeader($"Hourly Usage (Day) - {DateOnly.FromDateTime(DateTime.Today).ToShortDateString()}")
+                        .UseHeader($"Hourly Usage (Day) - {DateOnly.FromDateTime(DateTime.Today.AddDays(-dateOffset)).ToShortDateString()}")
                         .UseYAxisPadding(1);
                     graph1.Write();
                     Console.WriteLine();
@@ -127,15 +127,16 @@ namespace DotSights.CLI.Commands
                         .UseValueGetter(kv => kv.Value)
                         .UseXTickFormatter(kv => kv.Key.ToString("0"))
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
-                        .UseHeader($"Hourly Usage (Night) - {DateOnly.FromDateTime(DateTime.Today).ToShortDateString()}")
+                        .UseHeader($"Hourly Usage (Night) - {DateOnly.FromDateTime(DateTime.Today.AddDays(-dateOffset)).ToShortDateString()}")
                         .UseMinValue(min)
                         .UseMaxValue(max)
                         .UseYAxisPadding(1);
+                        
                     graph2.Write();
                 }
                 else
                 {
-                    var graph = new Graph<KeyValuePair<int, int>>(dailyhourly.Take(12))
+                    var graph = new Graph<KeyValuePair<int, int>>(dailyhourly.Where(kvp => kvp.Key < 12))
                         .UseValueGetter(kv => kv.Value)
                         .UseXTickFormatter(kv => kv.Key.ToString("0"))
                         .UseYTickFormatter(v => DotFormatting.FormatTimeShort((int)v))
@@ -177,7 +178,7 @@ namespace DotSights.CLI.Commands
                     return new Row(processName, title, alltime);
                 });
 
-                t.SetHeader(new("Process Name", "Title", "Total usage"));
+                t.SetHeader("Process Name", "Title", "Total usage");
 
 
                 ApplyTableTemplate(t);
@@ -216,7 +217,7 @@ namespace DotSights.CLI.Commands
                     return new Row(processName, title, time);
                 });
 
-                t.SetHeader(new("Process name", "Title", "Usage time"));
+                t.SetHeader("Process name", "Title", "Usage time");
 
                 ApplyTableTemplate(t);
 
@@ -274,7 +275,7 @@ namespace DotSights.CLI.Commands
                     return new Row(processName, title, alltime, todaytime, weektime);
                 });
 
-                t.SetHeader(new("Process Name", "Title", "Total usage", "Today's usage", "Past 7 days' usage"));
+                t.SetHeader("Process Name", "Title", "Total usage", "Today's usage", "Past 7 days' usage");
 
                 ApplyTableTemplate(t);
 

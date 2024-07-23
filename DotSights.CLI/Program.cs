@@ -1,6 +1,5 @@
 ﻿using DotSights.CLI.Commands;
 using System.CommandLine;
-using System.Globalization;
 
 var root = new RootCommand("A CLI for interacting with DotSights and it's tool box. Visualize data in a table, start or stop the tracker or change configuration. ");
 

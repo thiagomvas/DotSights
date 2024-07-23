@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.4.0"></a>
+## [1.4.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.4.0) (2024-07-23)
+
+### Features
+
+* CLI now shows graphs for usage for 'today', 'week' and 'today' with day offset ([6e3effe](https://www.github.com/thiagomvas/DotSights/commit/6e3effe2260a00fd8d147fb8d27b74479efb54bf))
+* Tracker now tracks daily hourly usage for the last 7 days ([dfc11d2](https://www.github.com/thiagomvas/DotSights/commit/dfc11d25b23c8d4c005365717e8206df292be8f1))
+
+### Bug Fixes
+
+* Display graphs no longer crash when giving a large offset ([77f116a](https://www.github.com/thiagomvas/DotSights/commit/77f116a32ee9eef96f58ef741271c70495a9f7ef))
+
 <a name="1.3.0"></a>
 ## [1.3.0](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.3.0) (2024-07-13)
 

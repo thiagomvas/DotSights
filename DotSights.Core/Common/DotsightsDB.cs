@@ -18,6 +18,13 @@ namespace DotSights.Core.Common
             dailyDatas = new List<DailyData>();
         }
 
+        public DotsightsDB(DotSightsSettings settings)
+        {
+            _settings = settings;
+            activities = new List<ActivityData>();
+            dailyDatas = new List<DailyData>();
+        }
+
         public void LoadDataFromFile()
         {
             activities = DotSights.GetDataFromDataPath();

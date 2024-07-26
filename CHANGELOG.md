@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.4.2"></a>
+## [1.4.2](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.4.2) (2024-07-25)
+
+### Bug Fixes
+
+* Add missing check for storage optimizations ([0640080](https://www.github.com/thiagomvas/DotSights/commit/06400801c847f5ceee25569ac59846852adfffc6))
+* Grouped Process Names now default to lower case invariant ([eec568a](https://www.github.com/thiagomvas/DotSights/commit/eec568a52e2ea1d6c0342693eb81ace9f137d8cd))
+
 <a name="1.4.1"></a>
 ## [1.4.1](https://www.github.com/thiagomvas/DotSights/releases/tag/v1.4.1) (2024-07-23)
 

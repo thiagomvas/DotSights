@@ -4,34 +4,18 @@ using SharpTables;
 using SharpTables.Graph;
 using System.Globalization;
 
-var db = new DotsightsDB();
-db.LoadDataFromFile();
+var settings = new DotSightsSettings { GroupedProcessNames = ["process1"], OptimizeForStorageSpace = true };
 
-var data1 = new ActivityData
-{
-    WindowTitle = "Visual Studio Code",
-    ProcessName = "code",
-    FocusedTimeInSeconds = (int)TimeSpan.FromMinutes(1).TotalSeconds,
-    UsageTimePerHour = { { 10, 60 } },
-};
+var grouped1 = new ActivityData { ProcessName = "Process1", WindowTitle = "Window1", FocusedTimeInSeconds = 10 };
+var grouped2 = new ActivityData { ProcessName = "Process1", WindowTitle = "Window2", FocusedTimeInSeconds = 10 };
+var ungrouped1 = new ActivityData { ProcessName = "Process2", WindowTitle = "Window3", FocusedTimeInSeconds = 10 };
+var ungrouped2 = new ActivityData { ProcessName = "Process3", WindowTitle = "Window4", FocusedTimeInSeconds = 10 };
 
-var data2 = new ActivityData
-{
-    WindowTitle = "Window 2",
-    ProcessName = "data2",
-    FocusedTimeInSeconds = (int)TimeSpan.FromMinutes(1).TotalSeconds,
-};
-var data3 = new ActivityData
-{
-    WindowTitle = "Visual Studio Code",
-    ProcessName = "code",
-    FocusedTimeInSeconds = (int)TimeSpan.FromMinutes(3).TotalSeconds,
-    UsageTimePerHour = { { 11, 180 } },
-};
-
-db.AddData(data1);
-db.AddData(data2);
-db.AddData(data3);
+var db = new DotsightsDB(settings);
+db.AddData(grouped1);
+db.AddData(grouped2);
+db.AddData(ungrouped1);
+db.AddData(ungrouped2);
 
 Table.FromDataSet(db.Activities, a =>
 {
@@ -40,11 +24,3 @@ Table.FromDataSet(db.Activities, a =>
     .SetHeader(new("Window Title", "Process Name", "Focused Time (s)"))
     .UseFormatting(TableFormatting.ASCII)
     .Write();
-
-new Graph<KeyValuePair<int, int>>(db.DailyDatas[0].UsageTimePerHour)
-    .UseValueGetter(kvp => kvp.Value)
-    .UseXTickFormatter(kvp => kvp.Key.ToString("0"))
-    .UseYTickFormatter(v => v.ToString("0"))
-    .Write();
-
-db.SaveChanges();

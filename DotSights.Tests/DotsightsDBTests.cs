@@ -86,6 +86,30 @@ namespace DotSights.Tests
             Assert.IsTrue(savedActivities.Any(a => a.WindowTitle.Equals(activityData2.WindowTitle)));
             Assert.That(savedDailyDatas[0].Date, Is.EqualTo(DateTime.Today));
         }
+
+        [Test]
+        public void AddData_WhenStorageOptimized_ShouldGroupOnlyGroupedProcessesTogether()
+        {
+            // Arrange
+            var grouped1 = new ActivityData { ProcessName = "Process1", WindowTitle = "Window1" };
+            var grouped2 = new ActivityData { ProcessName = "Process1", WindowTitle = "Window2" };
+            var ungrouped1 = new ActivityData { ProcessName = "Process2", WindowTitle = "Window3" };
+            var ungrouped2 = new ActivityData { ProcessName = "Process3", WindowTitle = "Window4" };
+            var settings = new DotSightsSettings { GroupedProcessNames = ["process1"], OptimizeForStorageSpace = true };
+
+            // Act
+            var db = new DotsightsDB(settings);
+            db.AddData(grouped1);
+            db.AddData(grouped2);
+            db.AddData(ungrouped1);
+            db.AddData(ungrouped2);
+
+            // Assert
+            Assert.That(db.Activities.Count, Is.EqualTo(3), "Did not group any processes");
+            Assert.That(db.Activities.Where(a => a.ProcessName == ungrouped1.ProcessName).Count(), Is.EqualTo(1), "Grouped process 2");
+            Assert.That(db.Activities.Where(a => a.ProcessName == ungrouped2.ProcessName).Count(), Is.EqualTo(1), "Grouped process 3");
+            Assert.That(db.Activities.Where(a => a.ProcessName == grouped1.ProcessName).Count(), Is.EqualTo(1), "Did not group process 1");
+        }
     }
 
 }

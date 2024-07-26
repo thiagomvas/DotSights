@@ -18,6 +18,13 @@ namespace DotSights.Core.Common
             dailyDatas = new List<DailyData>();
         }
 
+        public DotsightsDB(DotSightsSettings settings)
+        {
+            _settings = settings;
+            activities = new List<ActivityData>();
+            dailyDatas = new List<DailyData>();
+        }
+
         public void LoadDataFromFile()
         {
             activities = DotSights.GetDataFromDataPath();
@@ -29,9 +36,10 @@ namespace DotSights.Core.Common
             AddDataToDaily(data);
 
             ActivityData match = null;
-            if (_settings.OptimizeForStorageSpace)
+            if (_settings.OptimizeForStorageSpace && _settings.GroupedProcessNames.Contains(data.ProcessName.ToLowerInvariant()))
             {
-                match = activities.Where(x => x.ProcessName.ToLower() == data.ProcessName.ToLower()).FirstOrDefault();
+                string lower = data.ProcessName.ToLower();
+                match = activities.Where(x => x.ProcessName.ToLower() == lower).FirstOrDefault();
             }
             else
             {

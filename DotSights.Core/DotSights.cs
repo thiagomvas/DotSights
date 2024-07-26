@@ -76,6 +76,7 @@ public static class DotSights
     /// <param name="settings">The settings to save</param>
     public static void SaveSettings(DotSightsSettings settings)
     {
+        settings.GroupedProcessNames = settings.GroupedProcessNames.Select(p => p.ToLowerInvariant()).ToList();
         File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(settings, typeof(DotSightsSettings), DotSightSettingsGenerationContext.Default));
     }
 
